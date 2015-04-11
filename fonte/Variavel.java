@@ -12,14 +12,11 @@ public class Variavel {
 	//
 	// 	Métodos
 	//
-	public void setNome (String n) this.nome = n;
-	public String getNome () return this.nome;
+	public void setNome (String n) { this.nome = n; }
+	public String getNome () { return this.nome; }
 
-	public void setValor (double d) this.valor = d;
-	public double getValor () return this.valor;
-	
-	
-	
-	
+	public void setValor (double d) { this.valor = d; }
+	public double getValor () { return this.valor; }
+
 	
 }

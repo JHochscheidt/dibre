@@ -7,7 +7,7 @@
  */ 
 
 class Interpretador {
-    private String linhas[];
+    public String linhas[];
 
     public void interpreta(String l[]) {
         this.linhas = l;
@@ -18,5 +18,9 @@ class Interpretador {
                 System.out.println("Linha " + (i + 1) + ": " + this.linhas[i]);
             }
         }
+        
+        
+        
+        
     }
 }
