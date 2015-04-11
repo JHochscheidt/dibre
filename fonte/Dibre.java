@@ -1,3 +1,5 @@
+// CÓDIGO COPIADO DOS ARQUIVOS DISPONIBILIZADOS VIA MOODLE PELO PROFESSOR FERNANDO
+
 /*
  * 
  * Universidade Federal da Fronteira Sul 
@@ -26,6 +28,8 @@
  */
 
 
+
+asdjasdjaidsja teste dibre
 import java.util.Scanner;
 import java.io.*;
 
