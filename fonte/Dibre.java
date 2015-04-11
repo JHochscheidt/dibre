@@ -28,8 +28,6 @@
  */
 
 
-
-asdjasdjaidsja teste dibre
 import java.util.Scanner;
 import java.io.*;
 
