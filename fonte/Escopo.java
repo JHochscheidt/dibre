@@ -1,7 +1,7 @@
 class Escopo{
 
-	short inicio;
-	short fim;
+	private short inicio;
+	private short fim;
 
 
 	public void setInicio(short i){
@@ -11,7 +11,7 @@ class Escopo{
 		return this.inicio;
 	}
 	
-	public setFim(short f){
+	public void setFim(short f){
 		this.fim = f;
 	}
 	public short getFim(){
