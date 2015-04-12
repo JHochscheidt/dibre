@@ -1,0 +1,5 @@
+class Expressao{
+	
+	Operacao operacao[];	
+
+}
