@@ -19,20 +19,20 @@ public class Variavel {
 	public double getValor () { return this.valor; }
 	
 	
-	public void validarDeclaracao(String[] tokens){
-		
-		if(tokens[0] == null || tokens[0].trim().length() == 0){
-			//validou parte anterior ao token DOUBLE - palavra reservada - 
-			System.out.println("STRING vazia");
-			tokens = tokens[1].split(" ");
-			for(int cont = 0; cont < tokens.length; cont++){
-				if(tokens[cont] == null || tokens[cont].trim().length() == 0){
-					System.out.println(cont + "token vazio");
-				}else{
-					
+	public void declararVariavel(String linha){
+		String[] tokens;
+		System.out.println(linha);
+		tokens = linha.split("[ \t\nx0B\f\r]"); // quebra a linha com qualquer tipo de espaço em branco
+		if(tokens.length > 0){
+			for(int indice = 0;indice < tokens.length; indice++){
+				//se entrar neste if, significa que é o nome da variavel
+				//System.out.println(indice + "'"+tokens[indice]+"'"+  "\ttamanho" + tokens[indice].length());
+				if(tokens[indice].length() != 0 && !tokens[indice].equals("double") && !tokens[indice].equals(";")){
+					this.setNome(tokens[indice]);
+					//System.out.println(tokens[indice]);	// imprime o nome da variavel
 				}
-				System.out.println(cont + "'" + tokens[cont] + "'");
 			}
+				
 		}
 	}
 }
