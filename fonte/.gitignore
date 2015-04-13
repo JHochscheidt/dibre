@@ -1,6 +1,5 @@
 *.class
 PR-2015-T1.pdf
 ../.lock.manual.odt#
-./metadata/*
 ../manual.odt
-../fonte/.metadata/*
+../ExpressãoRegular.txt
