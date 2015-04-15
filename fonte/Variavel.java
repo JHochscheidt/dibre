@@ -31,9 +31,14 @@ public class Variavel {
 				//se entrar neste if, significa que é o nome da variavel
 				//System.out.println(indice + "'"+tokens[indice]+"'"+  "\ttamanho" + tokens[indice].length());
 				if(tokens[indice].length() != 0 && !tokens[indice].equals("double") && !tokens[indice].equals(";")){
-					Variavel newVar = new Variavel();
-					newVar.setNome(tokens[indice]);
-					variavel.add(newVar);
+					if(this.verificaSeExisteVariavel(variavel, tokens[indice])){
+						System.out.println("variavel ja existe");
+					}else{
+						System.out.println("variavel ainda nao existe, pode declarar");
+						Variavel newVar = new Variavel();
+						newVar.setNome(tokens[indice]);
+						variavel.add(newVar);
+					}
 					//System.out.println(tokens[indice]);	// imprime o nome da variavel
 				}
 			}	
@@ -57,14 +62,25 @@ public class Variavel {
 			}
 			// percorre o arraylist onde estao o nome das variaveis e seus valores
 			for(int cont = 0; cont < subTokens.size();cont = cont+2){
-				System.out.println(subTokens.get(cont));
-				System.out.println(subTokens.get(cont+1));
+				//System.out.println(subTokens.get(cont));
+				//System.out.println(subTokens.get(cont+1));
 				Variavel newVar = new Variavel();
 				newVar.setNome(subTokens.get(cont));
 				newVar.setValor(Double.parseDouble(subTokens.get(cont+1)));
 				variavel.add(newVar);
-				System.out.println("Nome " + newVar.getNome() + "Valor" + newVar.getValor());	
+				//System.out.println("Nome " + newVar.getNome() + "Valor" + newVar.getValor());	
 			}
 		}
 	}
+	
+	public boolean verificaSeExisteVariavel(ArrayList<Variavel> variavel , String var){
+		for(int cont = 0; cont < variavel.size(); cont++){
+			if(var.equals(variavel.get(cont).getNome())){
+				System.out.println("variavel ja existe");
+				return true;
+			}
+		}
+		return false;
+	}
+	
 }
