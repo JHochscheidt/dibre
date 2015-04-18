@@ -18,9 +18,11 @@ class Interpretador {
     // string que define com expressão regular, como se dará a declaração de uma variável
     String declaracaoDeVariavel = "\\s{0,}varDouble\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}\\s{0,};\\s{0,}";
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}varDouble\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
-    String atribuicaoComExpressao = "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[a-zA-Z]{1,}\\w{0,}|\\d{1,}\\.?\\d{0,}]\\s{0,};\\s{0,}";
-    
-    
+    String atribuicaoComExpressao ="\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}\\+|\\-|\\*|\\/\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
+    		
+    		
+    		
+    	//"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\+|\\-|\\*\\/\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\s{0,};\\s{0,}";   
     
     // metodo que recebe as linhas do arquivo
     public void interpreta(ArrayList<String> l) {
@@ -36,6 +38,7 @@ class Interpretador {
     // método que interpreta uma linha específica
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(String linha, int i){
+    	System.out.println("linha " + (i+1) + " -->");
     	//boolean b = linha.matches(); //System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
     	if(linha.matches(declaracaoDeVariavel)){
@@ -45,11 +48,7 @@ class Interpretador {
     			System.exit(0);
     		}		
     	}else if(linha.matches(declaracaoDeVariavelComAtribuicao)){
-    		System.out.println("declarando variavel com atribuicao");
     		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varDouble|=|;"));
-    		for(int cont = 0; cont < tokens.size(); cont++){
-    			System.out.println("'" + tokens.get(cont) + "'");
-    		}
     		if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1))) == null){
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
@@ -95,7 +94,7 @@ class Interpretador {
         
     // retorna true se variavel ja existe, senao retorna falso
     public boolean verificaSeExisteVariavel(String var){
-    	System.out.println("verificando se variavel ### " + var + " ### ja existe");
+    	//System.out.println("verificando se variavel ### " + var + " ### ja existe");
 		for(int cont = 0; cont < this.variavel.size(); cont++)
 			if(var.equals(this.variavel.get(cont).getNome()))
 				return true;
