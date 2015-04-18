@@ -30,13 +30,15 @@
 
 import java.util.Scanner;
 import java.io.*;
+import java.util.ArrayList;
 
 class Dibre {
+	
     public static void main(String args[]) throws Exception {
         File f;
         Scanner s;
         Interpretador b;
-        String linhas[] = new String[2000]; // arquivo pode ter, no máximo, 2000 linhas.
+        ArrayList<String> linhas = new ArrayList<String>(); 
 
         // args[0] conterá o caminho para o arquivo que serah interpretado.
         f = new File(args[0]);
@@ -46,11 +48,9 @@ class Dibre {
         b = new Interpretador();
 
         // Lemos todas as linhas do arquivo para dentro do
-        // vetor "linhas".
-        int i = 0;
+        // ArrayList "linhas".
         while(s.hasNext()) {
-            linhas[i] = s.nextLine();
-            i++;
+        	linhas.add(s.nextLine());
         }
 
         // Inicializamos o interpretador com o vetor de linhas. A partir
@@ -58,7 +58,7 @@ class Dibre {
         b.interpreta(linhas);
         
         //System.out.println("imprimindo variaveis");
-        //b.imprimeVariaveis();
+        b.imprimeVariaveis();
         
     }
 }
