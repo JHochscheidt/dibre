@@ -20,18 +20,32 @@ public class Variavel {
 	public void setValor (double d) { this.valor = d; }
 	public double getValor () { return this.valor; }
 	
+	public void declararVariavel(String nome, double valor){
+		this.setNome(nome);
+		this.setValor(valor);		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	// apenas declaracao de variavel
-	public void declararVariavel(String linha, ArrayList<Variavel> variavel){
-		String[] tokens;
-		System.out.println(linha);
-		tokens = linha.split(Interpretador.espacoEmBranco); // quebra a linha com qualquer tipo de espaço em branco
-		if(tokens.length > 1){
+	 /*public Variavel declararVariavel(ArrayList<String> tokens, ArrayList<Variavel> variavel){
+		if(tokens.size() > 1){
 			//System.out.println("aqui");
-			for(int indice = 0;indice < tokens.length; indice++){
+			for(int indice = 0;indice < tokens.size(); indice++){
 				//se entrar neste if, significa que é o nome da variavel
 				//System.out.println(indice + "'"+tokens[indice]+"'"+  "\ttamanho" + tokens[indice].length());
-				if(tokens[indice].length() != 0 && !tokens[indice].equals("double") && !tokens[indice].equals(";")){
-					if(this.verificaSeExisteVariavel(variavel, tokens[indice])){
+				if(tokens.get(indice).length() != 0 && !tokens.get(indice).equals("double") && !tokens.get(indice).equals(";")){
+					/*if(this.verificaSeExisteVariavel(variavel,){
 						System.out.println("variavel ja existe");
 					}else{
 						System.out.println("variavel ainda nao existe, pode declarar");
@@ -43,44 +57,36 @@ public class Variavel {
 				}
 			}	
 		}
+		return null;
 	}
 	
+	
 	// declaracao com atribuicao de valor a variavel
-	public void declararVariavelComAtribuicao(String linha, ArrayList<Variavel> variavel){
-		String[] tokens;
-		System.out.println(linha);
-		tokens = linha.split(Interpretador.espacoEmBranco);
-		ArrayList<String>subTokens = new ArrayList<String>();		
-		if(tokens.length > 1){
+	public Variavel declararVariavelComAtribuicao(ArrayList<String> tokens, ArrayList<Variavel> variavel){
+		if(tokens.size() > 1){
 			int indice, indIndice;
 			// percorre a linha procurando por tokens diferente de caracteres e palavras reservadas e joga pra dentro de um arraylist
-			for(indice = 0; indice < tokens.length; indice++){
-				//System.out.println("valor  " + indice + "    " + tokens[indice] + "tamanho   " +  tokens[indice].length()	);
-				if(tokens[indice].length() > 0 && !tokens[indice].equals("double") && !tokens[indice].equals("=") && !tokens[indice].equals(";")){
-					subTokens.add(tokens[indice]);
+			for(indice = 0; indice < tokens.size(); indice++){
+				System.out.println("valor  " + indice + "    " + tokens.get(indice) + "tamanho   " +  tokens.get(indice).length()	);
+				if( !tokens.get(indice).equals("double") && !tokens.get(indice).equals("=") && !tokens.get(indice).equals(";")){
+					
 				}
 			}
 			// percorre o arraylist onde estao o nome das variaveis e seus valores
-			for(int cont = 0; cont < subTokens.size();cont = cont+2){
+			//for(int cont = 0; cont < subTokens.size();cont = cont+2){
 				//System.out.println(subTokens.get(cont));
 				//System.out.println(subTokens.get(cont+1));
-				Variavel newVar = new Variavel();
-				newVar.setNome(subTokens.get(cont));
-				newVar.setValor(Double.parseDouble(subTokens.get(cont+1)));
-				variavel.add(newVar);
+				/*if(this.verificaSeExisteVariavel(variavel, subTokens.get(cont))){ // já existe variavel com subTokens.get(cont) nome
+					return null;
+				}else{
+					Variavel newVar = new Variavel();
+					newVar.setNome(subTokens.get(cont));
+					newVar.setValor(Double.parseDouble(subTokens.get(cont+1)));
+					return newVar;
+				}
 				//System.out.println("Nome " + newVar.getNome() + "Valor" + newVar.getValor());	
-			}
+			//}
 		}
-	}
-	
-	public boolean verificaSeExisteVariavel(ArrayList<Variavel> variavel , String var){
-		for(int cont = 0; cont < variavel.size(); cont++){
-			if(var.equals(variavel.get(cont).getNome())){
-				System.out.println("variavel ja existe");
-				return true;
-			}
-		}
-		return false;
-	}
-	
+		return null;
+	}*/
 }

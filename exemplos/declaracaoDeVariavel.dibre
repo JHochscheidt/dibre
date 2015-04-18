@@ -1,4 +1,10 @@
-		 	 	double	varteste	=	10.50	 	 	 	;
-double abacatinho = 50			;
-double abobrinha ; 
+		 double var1 ;		 	 	
+	
+	 	double	Varteste	=	-10.50	 	 	 	;
+double Var2 = 50			;
+
+
+double var1;
+
+
 		 
