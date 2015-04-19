@@ -12,13 +12,16 @@ import java.util.regex.*;
 
 class Interpretador {
     private ArrayList<String> linhas;
-    public static final String espacoEmBranco = "[ \t\nxB\f\r]";
+    public static final String espacoEmBranco = "[ \t\n\f\r]";
     
 	public ArrayList<Variavel> variavel = new ArrayList<Variavel>();
     // string que define com expressão regular, como se dará a declaração de uma variável
-    String declaracaoDeVariavel = "\\s{0,}varDouble\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}\\s{0,};\\s{0,}";
-    String declaracaoDeVariavelComAtribuicao = "\\s{0,}varDouble\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
-    String atribuicaoComExpressao ="\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}\\+|\\-|\\*|\\/\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
+    String declaracaoDeVariavel = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}\\s{0,};\\s{0,}";
+    String declaracaoDeVariavelComAtribuicao = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
+    String atribuicaoComExpressao =
+    		"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
+    
+    //\\-?\\d{1,}\\.?\\d{0,}\\s{0,}([mais]|[menos]|[multiplica]|[divide])\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
     		
     		
     		
@@ -42,19 +45,30 @@ class Interpretador {
     	//boolean b = linha.matches(); //System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
     	if(linha.matches(declaracaoDeVariavel)){
-    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varDouble|;"));
+    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varReal|;"));
     		if(this.declararVariavel(tokens.get(0),0) == null){
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}		
     	}else if(linha.matches(declaracaoDeVariavelComAtribuicao)){
-    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varDouble|=|;"));
+    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varReal|=|;"));
     		if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1))) == null){
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}
     	}else if(linha.matches(atribuicaoComExpressao)){
-    		System.out.println("atribuicao com expressao");
+    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|SOMA|SUBTRAI|MULTIPLICA|DIVIDE|;|="));
+    		//for(int cont = 0; cont < tokens.size(); cont++){ System.out.println("'" + tokens.get(cont) + "'"); }
+    		if(this.verificaSeExisteVariavel(tokens.get(0))){
+    			System.out.println("aqui");
+    			ArrayList<String> subTokens = new ArrayList<String>();
+    			subTokens = this.procuraTokens(linha,Interpretador.espacoEmBranco + "|[^SOMA|^SUBTRAI|^MULTIPLICA|^DIVIDE]");
+    			//System.out.println(subTokens.size()); for(int cont = 0; cont < subTokens.size(); cont++){ System.out.println("'" + subTokens.get(cont) + "'" +  " tamanho " + tokens.get(cont).length()); }
+    			
+    		}else{
+    			System.out.println("variavel nao existe");
+    			System.exit(0);
+    		}
     	}else{
     		System.out.println("erroooooooooooooo");
     	}
