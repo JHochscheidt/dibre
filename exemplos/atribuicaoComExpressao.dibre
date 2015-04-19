@@ -1,4 +1,3 @@
-varDouble var1;
-varDouble var2 = 10;
-
-var1=-50.50-20;
+varReal var1;
+varReal var2 = 10;
+var1 = abacate SUBTRAI 10.10 SOMA 10 DIVIDE 50 MULTIPLICA var2;
