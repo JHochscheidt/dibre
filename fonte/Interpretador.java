@@ -19,15 +19,8 @@ class Interpretador {
     String declaracaoDeVariavel = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,};\\s{0,}";
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
     String atribuicaoComExpressao =
-    	"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}\\s{0,}|\\-?\\d{1,}\\.?\\d{0,}\\s{0,})\\s{0,}"; //|\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]" ;
-    	//\\s{0,}SOMA|SUBTRAI|MULTIPLICA|DIVIDE\\s{0,}" ; /*+ //operador
-    	//"[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]|\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}" ;/* + //operando1
-    	//"[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]" + // operando2
-    	//"\\s{0,};\\s{0,}";
-
-
-
-
+    	"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)\\s{1,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
+        
     /* atribuicao com expressao aceitando varios operadores e operandos
     "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
     */

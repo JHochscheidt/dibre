@@ -1,10 +1,4 @@
 varReal a = 10 ;
 varReal b = 20 ;
 varReal c;
-
-c 	 	= abacate
-c = -10.10
-
-
-
-
+c=abacate SOMA -10.10;
