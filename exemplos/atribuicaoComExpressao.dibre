@@ -1,3 +1,10 @@
-varReal var1;
-varReal var2 = 10;
-var1 = abacate SUBTRAI 10.10 SOMA 10 DIVIDE 50 MULTIPLICA var2;
+varReal a = 10 ;
+varReal b = 20 ;
+varReal c;
+
+c 	 	= abacate
+c = -10.10
+
+
+
+
