@@ -20,7 +20,7 @@ class Interpretador {
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
     String atribuicaoComExpressao = "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)\\s{1,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
     String comandoDeSaida =
-        "\\s{0,}MOSTRAR\\s{1,}((\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})MAIS?){1,}\\s{0,};\\s{0,}";
+        "\\s{0,}MOSTRAR\\s{1,}[(\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}(\\s{0,}MAIS\\s{0,}(\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})){0,}\\s{0,};\\s{0,}";
 
     /* atribuicao com expressao aceitando varios operadores e operandos
     "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
@@ -51,6 +51,7 @@ class Interpretador {
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}
+            tokens.clear();
     	}
         else if(linha.matches(declaracaoDeVariavelComAtribuicao)){
     		System.out.println("declaracaoDeVariavelComAtribuicao");
@@ -59,6 +60,7 @@ class Interpretador {
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}
+            tokens.clear();
     	}
         else if(linha.matches(atribuicaoComExpressao)){
     		System.out.println("atribuicaoComExpressao");
@@ -120,10 +122,48 @@ class Interpretador {
     		}else{
     				System.out.println("variavel nao existe");
     		} // else verifica se variavel existe
-    	}
+            tokens.clear();
+        }
         else if(linha.matches(comandoDeSaida)){
             System.out.println("comando de saida");
+            System.out.println(linha + "\n");
+            String impressao = "";
+            tokens.addAll(this.procuraTokens(linha,Interpretador.espacoEmBranco + "|#|MOSTRAR|;"));
+            for(int cont = 0; cont < tokens.size(); cont++){
+                System.out.println("'" + tokens.get(cont) + "'");
+            }
 
+            /*
+            //int cont;
+            for(int cont = 0; cont < tokens.size(); cont++){
+                if(tokens.get(cont).startsWith("#")){
+                    System.out.println(cont + " comeca com #");
+                    //percorre a string enquanto nao acha o fim (#)
+                    if(tokens.get(cont).length() == 1)
+                        cont++;
+                    else{
+                        impressao = impressao + tokens.get(cont).replace("#","");
+                        System.out.println("trocando # por '' " + impressao);
+                    }
+                    //System.out.println("imprimindo linha");
+                    //System.out.println(impressao);
+                    for(; !tokens.get(cont).endsWith("#"); cont++){
+                        impressao = impressao + tokens.get(cont);
+                    }
+                    if(tokens.get(cont).endsWith("#")){
+                        if(tokens.get(cont).length() == 1)
+                            cont++;
+                        else{
+                            //System.out.println("trocando # por '' " + impressao);
+                            impressao = impressao + tokens.get(cont).replace("#", "");
+                        }
+                    }
+                }
+                impressao = impressao + tokens.get(cont);
+            }
+            System.out.println("\n\n\n\t\t\t\t IMPRIMINDO\n\n\n" + impressao + "\n\n\n");
+            */
+            tokens.clear();
         }else{
     		System.out.println("erro linha " + (i+1));
     	} // else verificacao de qual expressao regular se trata
