@@ -20,7 +20,7 @@ class Interpretador {
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
     String atribuicaoComExpressao = "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)\\s{1,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
     String comandoDeSaida =
-        "\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
+        "\\s{0,}MOSTRAR\\s{1,}((\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})MAIS?){1,}\\s{0,};\\s{0,}";
 
     /* atribuicao com expressao aceitando varios operadores e operandos
     "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
