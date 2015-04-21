@@ -8,20 +8,34 @@
  */
 
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.regex.*;
 
 class Interpretador {
     private ArrayList<String> linhas;
     public static final String espacoEmBranco = "[ \t\n\f\r]";
-
 	public ArrayList<Variavel> variavel = new ArrayList<Variavel>();
-    // string que define com expressão regular, como se dará a declaração de uma variável
-    String declaracaoDeVariavel = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,};\\s{0,}";
+	Stack<Escopo> pilha = new Stack<Escopo>();
+	
+	
+	
+	
+	
+	
+	// string que define com expressão regular, como se dará a declaração de uma variável
+	String inicioCodigo = "\\s{0,}INICIO\\s{0,}";
+	String fimCodigo = "\\s{0,}FIM\\s{0,}";
+	String tipoDeVariavel = "\\s{0,}varReal\\s{1,}";
+	String nomeDeVariavel = "[a-zA-Z]{1,}\\w{0,}";
+    String declaracaoDeVariavel = tipoDeVariavel + nomeDeVariavel + "\\s{0,};\\s{0,}";
+    String expressao = "\\s{0,}(\\w{1,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,}(";
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
     String atribuicaoComExpressao = "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)\\s{1,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
-    String comandoDeSaida =
-        "\\s{0,}MOSTRAR\\s{1,}[(\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}(\\s{0,}MAIS\\s{0,}(\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})){0,}\\s{0,};\\s{0,}";
-
+    String ifElseIf = "\\s{0,}(SE|SENAOSE|SENAO)\\s{0,}";
+    String laco = "\\s{0,}PARA\\s{0,}expressao\\s{0,}FAÇA\\s{0,}";
+    
+    //String comandoDeSaida ="\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{1,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\s{0,}\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}\\s{0,};\\s{0,}";
+    
     /* atribuicao com expressao aceitando varios operadores e operandos
     "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
     */
@@ -33,8 +47,9 @@ class Interpretador {
         //percorre as linhas do arquivo
         for(int i = 0; i < this.linhas.size(); i++) {
         	//verifica se a linha está vazia
-            if(this.linhas.get(i) != null)
+            if(this.linhas.get(i).length() != 0){
                 this.interpretaLinha(this.linhas.get(i), i);
+            }
         }
     }
 
@@ -44,7 +59,12 @@ class Interpretador {
     	System.out.println("linha " + (i+1) + " -->");
     	//boolean b = linha.matches(); System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
-    	if(linha.matches(declaracaoDeVariavel)){
+    	if(linha.matches(inicioCodigo)){
+    		System.out.println("inicio do codigo");
+    		Escopo programa = new Escopo("programa", (i+1));
+    		pilha.push(programa);
+    	}
+    	else if(linha.matches(declaracaoDeVariavel)){
     		System.out.println("declaracaoDeVariavel");
     		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varReal|;"));
     		if(this.declararVariavel(tokens.get(0),0, false) == null){
@@ -124,11 +144,13 @@ class Interpretador {
     		} // else verifica se variavel existe
             tokens.clear();
         }
+    	/*
         else if(linha.matches(comandoDeSaida)){
+        	
             System.out.println("comando de saida");
             System.out.println(linha + "\n");
             String impressao = "";
-            tokens.addAll(this.procuraTokens(linha,Interpretador.espacoEmBranco + "|#|MOSTRAR|;"));
+            tokens.addAll(this.procuraTokens(linha,Interpretador.espacoEmBranco + "|MOSTRAR|;"));
             for(int cont = 0; cont < tokens.size(); cont++){
                 System.out.println("'" + tokens.get(cont) + "'");
             }
@@ -162,9 +184,19 @@ class Interpretador {
                 impressao = impressao + tokens.get(cont);
             }
             System.out.println("\n\n\n\t\t\t\t IMPRIMINDO\n\n\n" + impressao + "\n\n\n");
-            */
             tokens.clear();
-        }else{
+            
+        else if(linha.matches(ifElseIf)){
+        	//codigo para if else if
+        	System.out.println("ifElseIf");
+
+        }
+        */
+        else if(linha.matches(laco)){
+        	//codigo para laço
+        	System.out.println("laço");
+        }        
+        else{
     		System.out.println("erro linha " + (i+1));
     	} // else verificacao de qual expressao regular se trata
 	} // metodo interpretaLinha
