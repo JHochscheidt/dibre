@@ -18,8 +18,9 @@ class Interpretador {
     // string que define com expressão regular, como se dará a declaração de uma variável
     String declaracaoDeVariavel = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,};\\s{0,}";
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
-    String atribuicaoComExpressao =
-    	"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)\\s{1,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
+    String atribuicaoComExpressao = "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)\\s{1,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
+    String comandoDeSaida =
+        "\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{0,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
 
     /* atribuicao com expressao aceitando varios operadores e operandos
     "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
@@ -41,8 +42,7 @@ class Interpretador {
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(String linha, int i){
     	System.out.println("linha " + (i+1) + " -->");
-    	boolean b = linha.matches(atribuicaoComExpressao);
-    	System.out.println(b);
+    	//boolean b = linha.matches(); System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
     	if(linha.matches(declaracaoDeVariavel)){
     		System.out.println("declaracaoDeVariavel");
@@ -51,14 +51,16 @@ class Interpretador {
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}
-    	}else if(linha.matches(declaracaoDeVariavelComAtribuicao)){
+    	}
+        else if(linha.matches(declaracaoDeVariavelComAtribuicao)){
     		System.out.println("declaracaoDeVariavelComAtribuicao");
     		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varReal|=|;"));
     		if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1)),true) == null){
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}
-    	}else if(linha.matches(atribuicaoComExpressao)){
+    	}
+        else if(linha.matches(atribuicaoComExpressao)){
     		System.out.println("atribuicaoComExpressao");
     		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|^SOMA|^SUBTRAI|^MULTIPLICA|^DIVIDE|;|="));
     		for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
@@ -117,8 +119,12 @@ class Interpretador {
 	    	    }// else verifica se operador é valido
     		}else{
     				System.out.println("variavel nao existe");
-    		} 
-    	}else{
+    		} // else verifica se variavel existe
+    	}
+        else if(linha.matches(comandoDeSaida)){
+            System.out.println("comando de saida");
+
+        }else{
     		System.out.println("erro linha " + (i+1));
     	} // else verificacao de qual expressao regular se trata
 	} // metodo interpretaLinha
