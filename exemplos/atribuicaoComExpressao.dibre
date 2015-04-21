@@ -1,4 +1,6 @@
 varReal a = 10 ;
 varReal b = 20 ;
 varReal c;
-c=abacate SOMA -10.10;
+c= a SOMA -10;
+
+c = 50 DIVIDE c;
