@@ -16,26 +16,33 @@ class Interpretador {
     public static final String espacoEmBranco = "[ \t\n\f\r]";
 	public ArrayList<Variavel> variavel = new ArrayList<Variavel>();
 	Stack<Escopo> pilha = new Stack<Escopo>();
-	
-	
-	
-	
-	
-	
-	// string que define com expressão regular, como se dará a declaração de uma variável
+
+    /*
+     * Expressões regulares usadas para interpretação de cada linha do código
+     * As expressões dirão como funcionará cada tipo de comando
+     */
 	String inicioCodigo = "\\s{0,}INICIO\\s{0,}";
 	String fimCodigo = "\\s{0,}FIM\\s{0,}";
-	String tipoDeVariavel = "\\s{0,}varReal\\s{1,}";
+	String tipoDeVariavel = "varReal";
 	String nomeDeVariavel = "[a-zA-Z]{1,}\\w{0,}";
-    String declaracaoDeVariavel = tipoDeVariavel + nomeDeVariavel + "\\s{0,};\\s{0,}";
-    String expressao = "\\s{0,}(\\w{1,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,}(";
-    String declaracaoDeVariavelComAtribuicao = "\\s{0,}varReal\\s{1,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,};\\s{0,}";
-    String atribuicaoComExpressao = "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{1,}(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)\\s{1,}([a-zA-Z]{1,}\\w{0,}|\\-?\\d{1,}\\.?\\d{0,})\\s{0,};\\s{0,}";
-    String ifElseIf = "\\s{0,}(SE|SENAOSE|SENAO)\\s{0,}";
+    String valor = "\\-?\\d{1,}\\.?\\d{0,}";
+    String pontoEVirgula = "\\s{0,};\\s{0,}";
+    String operadoresAritmeticos = "(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)";
+    String operadoresRelacionais = "(MAIOR|MENOR|IGUAL|MAIORouIGUAL|MENORouIGUAL|DIFERENTE)";
+    String operadoresLogicos = "(OU|E|NEGAR)";
+    String expressaoAritmetica = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresAritmeticos + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
+    String expressaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
+    String expressaoLogica = "(" + expressaoAritmetica + "|" + expressaoRelacional + ")\\s{1,}" + operadoresLogicos + "\\s{1,}(" + expressaoAritmetica + "|" + expressaoRelacional + ")\\s{0,}";
+    String declaracaoDeVariavel = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + pontoEVirgula;
+    String declaracaoDeVariavelComAtribuicao = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + valor + pontoEVirgula;
+    String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + expressaoAritmetica + pontoEVirgula;
+    String ifElseIf = "\\s{0,}(SE|SENAOSE)\\s{1,}(" + expressaoAritmetica + "|" + expressaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
+    String fimIfElseIf = "\\s{0,}FIM"
+    String else = "\\s{0,}ELSE\\s{0,}"
     String laco = "\\s{0,}PARA\\s{0,}expressao\\s{0,}FAÇA\\s{0,}";
-    
+
     //String comandoDeSaida ="\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{1,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\s{0,}\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}\\s{0,};\\s{0,}";
-    
+
     /* atribuicao com expressao aceitando varios operadores e operandos
     "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
     */
@@ -57,7 +64,8 @@ class Interpretador {
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(String linha, int i){
     	System.out.println("linha " + (i+1) + " -->");
-    	//boolean b = linha.matches(); System.out.println(b);
+    	boolean b = linha.matches(ifElseIf);
+        System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
     	if(linha.matches(inicioCodigo)){
     		System.out.println("inicio do codigo");
@@ -66,8 +74,9 @@ class Interpretador {
     	}
     	else if(linha.matches(declaracaoDeVariavel)){
     		System.out.println("declaracaoDeVariavel");
-    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varReal|;"));
-    		if(this.declararVariavel(tokens.get(0),0, false) == null){
+    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|" + tipoDeVariavel + "|;"));
+    		//for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
+            if(this.declararVariavel(tokens.get(0),0, false) == null){
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}
@@ -76,6 +85,7 @@ class Interpretador {
         else if(linha.matches(declaracaoDeVariavelComAtribuicao)){
     		System.out.println("declaracaoDeVariavelComAtribuicao");
     		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varReal|=|;"));
+            //for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
     		if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1)),true) == null){
     			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
@@ -84,19 +94,18 @@ class Interpretador {
     	}
         else if(linha.matches(atribuicaoComExpressao)){
     		System.out.println("atribuicaoComExpressao");
-    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|^SOMA|^SUBTRAI|^MULTIPLICA|^DIVIDE|;|="));
-    		for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
+    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|^" + operadoresAritmeticos + "|;|="));
+    		//for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
     		//this.imprimeVariaveis();
     		// verifica se a variavel a receber resultado da expressao existe
     		if(this.variavelJaExiste(tokens.get(0)) != null){
     			String operador = tokens.get(2);
     			// verifica se o operador é valido
     			if(operador.equals("SOMA") || operador.equals("SUBTRAI") || operador.equals("MULTIPLICA") || operador.equals("DIVIDE")){
-    				System.out.println("aqui");
+                	//System.out.println("aqui");
 	    			Variavel aux = this.variavelJaExiste(tokens.get(0));
-	    			double operando1 = 0;
-					double operando2 = 0;
-	    			System.out.println("nome da variavel " + aux.getNome() + " valor " + aux.getValor());
+	    			double operando1 = 0, operando2 = 0;
+	    			//System.out.println("nome da variavel " + aux.getNome() + " valor " + aux.getValor());
 	                for(int cont = 1; cont < tokens.size(); cont++){
 	                	// se cont for impar, significa que é um operando, senao, é operador
 	                	if(cont%2 == 1){
@@ -143,10 +152,13 @@ class Interpretador {
     				System.out.println("variavel nao existe");
     		} // else verifica se variavel existe
             tokens.clear();
+
+        /*
         }
-    	/*
+
+
         else if(linha.matches(comandoDeSaida)){
-        	
+
             System.out.println("comando de saida");
             System.out.println(linha + "\n");
             String impressao = "";
@@ -185,17 +197,17 @@ class Interpretador {
             }
             System.out.println("\n\n\n\t\t\t\t IMPRIMINDO\n\n\n" + impressao + "\n\n\n");
             tokens.clear();
-            
+            */
+        }
         else if(linha.matches(ifElseIf)){
         	//codigo para if else if
         	System.out.println("ifElseIf");
 
         }
-        */
         else if(linha.matches(laco)){
         	//codigo para laço
         	System.out.println("laço");
-        }        
+        }
         else{
     		System.out.println("erro linha " + (i+1));
     	} // else verificacao de qual expressao regular se trata
