@@ -22,7 +22,7 @@ class Interpretador {
      * As expressões dirão como funcionará cada tipo de comando
      */
 	String inicioCodigo = "\\s{0,}INICIO\\s{0,}";
-	String fimCodigo = "\\s{0,}FIM\\s{0,}";
+	String fim = "\\s{0,}FIM\\s{0,}";
 	String tipoDeVariavel = "varReal";
 	String nomeDeVariavel = "[a-zA-Z]{1,}\\w{0,}";
     String valor = "\\-?\\d{1,}\\.?\\d{0,}";
@@ -30,16 +30,21 @@ class Interpretador {
     String operadoresAritmeticos = "(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)";
     String operadoresRelacionais = "(MAIOR|MENOR|IGUAL|MAIORouIGUAL|MENORouIGUAL|DIFERENTE)";
     String operadoresLogicos = "(OU|E|NEGAR)";
-    String expressaoAritmetica = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresAritmeticos + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
-    String expressaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
-    String expressaoLogica = "(" + expressaoAritmetica + "|" + expressaoRelacional + ")\\s{1,}" + operadoresLogicos + "\\s{1,}(" + expressaoAritmetica + "|" + expressaoRelacional + ")\\s{0,}";
+    String operacaoAritmetica = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresAritmeticos + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
+    String operacaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
+    String operacaoLogica = "(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}" + operadoresLogicos + "\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{0,}";
     String declaracaoDeVariavel = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + pontoEVirgula;
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + valor + pontoEVirgula;
-    String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + expressaoAritmetica + pontoEVirgula;
-    String ifElseIf = "\\s{0,}(SE|SENAOSE)\\s{1,}(" + expressaoAritmetica + "|" + expressaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
-    String fimIfElseIf = "\\s{0,}FIM"
-    String else = "\\s{0,}ELSE\\s{0,}"
+    String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + operacaoAritmetica + pontoEVirgula;
+    String seSenaoSe = "\\s{0,}(SE|SENAOSE)\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}ENTAO\\s{0,}";
+    String fimSeSenaoSe = fim ;
+    String senao = "\\s{0,}SENAO\\s{0,}";
+    String fimSenao = fim ;
     String laco = "\\s{0,}PARA\\s{0,}expressao\\s{0,}FAÇA\\s{0,}";
+    String fimLaco = fim;
+    String comandoDeSaida = "\\s{0,}MOSTRAR\\s{1,}[(\\$" + nomeDeVariavel + "|" + valor + "|\\w{1}\\s{0,})\\s{1,}]{0,}" + pontoEVirgula ;
+    String comandoDeEntrada = "";
+
 
     //String comandoDeSaida ="\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{1,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\s{0,}\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}\\s{0,};\\s{0,}";
 
@@ -64,7 +69,7 @@ class Interpretador {
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(String linha, int i){
     	System.out.println("linha " + (i+1) + " -->");
-    	boolean b = linha.matches(ifElseIf);
+    	boolean b = linha.matches(comandoDeSaida);
         System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
     	if(linha.matches(inicioCodigo)){
@@ -153,60 +158,34 @@ class Interpretador {
     		} // else verifica se variavel existe
             tokens.clear();
 
-        /*
+
         }
-
-
-        else if(linha.matches(comandoDeSaida)){
-
-            System.out.println("comando de saida");
-            System.out.println(linha + "\n");
-            String impressao = "";
-            tokens.addAll(this.procuraTokens(linha,Interpretador.espacoEmBranco + "|MOSTRAR|;"));
-            for(int cont = 0; cont < tokens.size(); cont++){
-                System.out.println("'" + tokens.get(cont) + "'");
-            }
-
-            /*
-            //int cont;
-            for(int cont = 0; cont < tokens.size(); cont++){
-                if(tokens.get(cont).startsWith("#")){
-                    System.out.println(cont + " comeca com #");
-                    //percorre a string enquanto nao acha o fim (#)
-                    if(tokens.get(cont).length() == 1)
-                        cont++;
-                    else{
-                        impressao = impressao + tokens.get(cont).replace("#","");
-                        System.out.println("trocando # por '' " + impressao);
-                    }
-                    //System.out.println("imprimindo linha");
-                    //System.out.println(impressao);
-                    for(; !tokens.get(cont).endsWith("#"); cont++){
-                        impressao = impressao + tokens.get(cont);
-                    }
-                    if(tokens.get(cont).endsWith("#")){
-                        if(tokens.get(cont).length() == 1)
-                            cont++;
-                        else{
-                            //System.out.println("trocando # por '' " + impressao);
-                            impressao = impressao + tokens.get(cont).replace("#", "");
-                        }
-                    }
-                }
-                impressao = impressao + tokens.get(cont);
-            }
-            System.out.println("\n\n\n\t\t\t\t IMPRIMINDO\n\n\n" + impressao + "\n\n\n");
-            tokens.clear();
-            */
-        }
-        else if(linha.matches(ifElseIf)){
-        	//codigo para if else if
-        	System.out.println("ifElseIf");
-
+        else if(linha.matches(seSenaoSe)){
+        	System.out.println("seSenaoSe");
         }
         else if(linha.matches(laco)){
         	//codigo para laço
         	System.out.println("laço");
+        }
+        else if(linha.matches(senao)){
+            System.out.println("senao");
+        }
+        else if(linha.matches(fim)){
+
+        }
+        else if(linha.matches(comandoDeEntrada)){
+
+        }
+        else if(linha.matches(comandoDeSaida)){
+            System.out.println("comando de saida");
+            tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|;"));
+            for(int cont = 0; cont < tokens.size(); cont++){
+                System.out.println(tokens.get(cont));
+            }
+            if(tokens.get(0).equals("MOSTRAR")){
+                System.out.println("comando valido");
+            }
+
         }
         else{
     		System.out.println("erro linha " + (i+1));
