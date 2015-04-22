@@ -13,7 +13,7 @@ import java.util.regex.*;
 
 class Interpretador {
     private ArrayList<String> linhas;
-    public static final String espacoEmBranco = "[ \t\n\f\r]";
+    public static final String espacoEmBranco = "[ \b\t\n\f\r]";
 	public ArrayList<Variavel> variavel = new ArrayList<Variavel>();
 	Stack<Escopo> pilha = new Stack<Escopo>();
 
@@ -42,9 +42,8 @@ class Interpretador {
     String fimSenao = fim ;
     String laco = "\\s{0,}PARA\\s{0,}expressao\\s{0,}FAÇA\\s{0,}";
     String fimLaco = fim;
-    String comandoDeSaida = "\\s{0,}MOSTRAR\\s{1,}[(\\$" + nomeDeVariavel + "|" + valor + "|\\w{1}\\s{0,})\\s{1,}]{0,}" + pontoEVirgula ;
+    String comandoDeSaida = "\\s{0,}MOSTRAR\\s{1,}[(\\$" + nomeDeVariavel + "|" + valor + "|\\w{1}\\s{0,}|\\S|\n)\\s{1,}]{0,}" + pontoEVirgula ;
     String comandoDeEntrada = "";
-
 
     //String comandoDeSaida ="\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{1,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\s{0,}\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}\\s{0,};\\s{0,}";
 
@@ -162,6 +161,7 @@ class Interpretador {
         }
         else if(linha.matches(seSenaoSe)){
         	System.out.println("seSenaoSe");
+
         }
         else if(linha.matches(laco)){
         	//codigo para laço
@@ -179,13 +179,34 @@ class Interpretador {
         else if(linha.matches(comandoDeSaida)){
             System.out.println("comando de saida");
             tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|;"));
-            for(int cont = 0; cont < tokens.size(); cont++){
-                System.out.println(tokens.get(cont));
-            }
             if(tokens.get(0).equals("MOSTRAR")){
                 System.out.println("comando valido");
+                //for(int cont = 1; cont < tokens.size(); cont++){ System.out.print(tokens.get(cont) + " "); }
+                for(int cont = 1; cont < tokens.size(); cont++){
+                    if(tokens.get(cont).startsWith("$")){
+                        //System.out.println(cont + " é variavel" + tokens.get(cont).length());
+                        String aux = tokens.get(cont).replace("$","");
+                        //System.out.println(aux + aux.length());
+                        if(this.variavelJaExiste(aux) != null){
+                            if(this.variavelJaExiste(aux).getInicializada()){
+                                System.out.println("variavel ja existe");
+                                tokens.set(cont, String.valueOf(this.variavelJaExiste(aux).getValor()));
+                                System.out.println(tokens.get(cont));
+                            }else{
+                                System.out.println("variavel nao inicializada, impossivel imprimir");
+                                System.exit(0);
+                            }
+                        }else{
+                            System.out.print("variavel nao existe");
+                            System.exit(0);
+                        }
+                    }
+                }
+                for(int cont = 1; cont < tokens.size(); cont++){
+                    System.out.print(tokens.get(cont) + " ");
+                }
+                System.out.println();
             }
-
         }
         else{
     		System.out.println("erro linha " + (i+1));
@@ -236,7 +257,7 @@ class Interpretador {
 
     // percorre o ArrayList de Variavel imprimindo nome e valor de cada variavel
     public void imprimeVariaveis(){
-    	System.out.println("\t###########################################");
+    	System.out.println("\n\t###########################################");
     	System.out.println("\t########## Variáveis do programa ##########");
     	for(int indice = 0; indice < this.variavel.size(); indice++){
         	System.out.println("\t########## -->  " + this.variavel.get(indice).getNome() + " = " + this.variavel.get(indice).getValor());
