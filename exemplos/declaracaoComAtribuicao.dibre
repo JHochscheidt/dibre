@@ -1,5 +1,8 @@
- varReal teste=-10.10;
+ INICIO
+
+
+ varReal teste  =   -10.10   ;
+
 	varReal var1 =-20.20;
  	 	varReal var= -10.50 ;
   varReal kkkkkk = 50.4 ;
-  
