@@ -29,7 +29,7 @@ class Interpretador {
     String pontoEVirgula = "\\s{0,};\\s{0,}";
     String operadoresAritmeticos = "(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)";
     String operadoresRelacionais = "(MAIOR|MENOR|IGUAL|MAIORouIGUAL|MENORouIGUAL|DIFERENTE)";
-    String operadoresLogicos = "(OU|E|NEGAR)";
+    String operadoresLogicos = "(OU|E)";
     String operacaoAritmetica = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresAritmeticos + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
     String operacaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
     String operacaoLogica = "(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}" + operadoresLogicos + "\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{0,}";
@@ -40,7 +40,7 @@ class Interpretador {
     String fimSeSenaoSe = fim ;
     String senao = "\\s{0,}SENAO\\s{0,}";
     String fimSenao = fim ;
-    String laco = "\\s{0,}PARA\\s{0,}expressao\\s{0,}FAÇA\\s{0,}";
+    String laco = "\\s{0,}ENQUANTO\\s{0,}(" + operacaoLogica + ")\\s{0,}FAÇA\\s{0,}";
     String fimLaco = fim;
     String comandoDeSaida = "\\s{0,}MOSTRAR\\s{1,}[(\\$" + nomeDeVariavel + "|" + valor + "|\\w{1}\\s{0,}|\\S|\n)\\s{1,}]{0,}" + pontoEVirgula ;
     String comandoDeEntrada = "";
@@ -67,8 +67,9 @@ class Interpretador {
     // método que interpreta uma linha específica
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(String linha, int i){
+        this.imprimeVariaveis();
     	System.out.println("linha " + (i+1) + " -->");
-    	boolean b = linha.matches(comandoDeSaida);
+    	boolean b = linha.matches(laco);
         System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
     	if(linha.matches(inicioCodigo)){
@@ -99,7 +100,7 @@ class Interpretador {
         else if(linha.matches(atribuicaoComExpressao)){
     		System.out.println("atribuicaoComExpressao");
     		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|^" + operadoresAritmeticos + "|;|="));
-    		//for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
+    		for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
     		//this.imprimeVariaveis();
     		// verifica se a variavel a receber resultado da expressao existe
     		if(this.variavelJaExiste(tokens.get(0)) != null){
@@ -147,7 +148,8 @@ class Interpretador {
 	                	}
 	                } // for de verificacao de variaveis ou valores
 	                aux.setValor(Operacao.operacao(operando1,operando2,tokens.get(2)));
-	                aux.setInicializada(true);
+                    aux.setInicializada(true);
+                    //System.out.println(aux.getInicializada() + " " + aux.getValor() + " " + aux.getNome());
 	    	    }else{
 	    			System.out.println("operador nao existe");
 	    			System.exit(0);
