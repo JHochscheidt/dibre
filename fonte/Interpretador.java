@@ -3,8 +3,7 @@
  *
  * Este código faz a leitura do arquivo fonte a ser interpretado,
  * e chama os métodos que fazem o reconhecimento dos comandos da linguagem .dibre
- *
- *
+ * *
  */
 
 import java.util.ArrayList;
@@ -20,9 +19,9 @@ class Interpretador {
     /*
      * Expressões regulares usadas para interpretação de cada linha do código
      * As expressões dirão como funcionará cada tipo de comando
-     */
+    */
 	String inicioCodigo = "\\s{0,}INICIO\\s{0,}";
-	String fim = "\\s{0,}FIM\\s{0,}";
+	String fimEscopo = "\\s{0,}FIM\\s{0,}";
 	String tipoDeVariavel = "varReal";
 	String nomeDeVariavel = "[a-zA-Z]{1,}\\w{0,}";
     String valor = "\\-?\\d{1,}\\.?\\d{0,}";
@@ -36,12 +35,10 @@ class Interpretador {
     String declaracaoDeVariavel = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + pontoEVirgula;
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + valor + pontoEVirgula;
     String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + operacaoAritmetica + pontoEVirgula;
-    String seSenaoSe = "\\s{0,}(SE|SENAOSE)\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}ENTAO\\s{0,}";
-    String fimSeSenaoSe = fim ;
-    String senao = "\\s{0,}SENAO\\s{0,}";
-    String fimSenao = fim ;
+    String IF = "\\s{0,}IF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
+    String elseIf = "\\s{0,}ELSEIF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
+    String ELSE = "\\s{0,}ELSE\\s{1,}FAÇA";
     String laco = "\\s{0,}ENQUANTO\\s{0,}(" + operacaoLogica + ")\\s{0,}FAÇA\\s{0,}";
-    String fimLaco = fim;
     String comandoDeSaida = "\\s{0,}MOSTRAR\\s{1,}[(\\$" + nomeDeVariavel + "|" + valor + "|\\w{1}\\s{0,}|\\S|\n)\\s{1,}]{0,}" + pontoEVirgula ;
     String comandoDeEntrada = "";
 
@@ -52,14 +49,16 @@ class Interpretador {
     */
     //"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\+|\\-|\\*\\/\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\s{0,};\\s{0,}";
 
+
+
     // metodo que recebe as linhas do arquivo
     public void interpreta(ArrayList<String> l) {
         this.linhas = l;
         //percorre as linhas do arquivo
         for(int i = 0; i < this.linhas.size(); i++) {
         	//verifica se a linha está vazia
-            if(this.linhas.get(i).length() != 0){
-                this.interpretaLinha(this.linhas.get(i), i);
+        	if(this.linhas.get(i).length() != 0){
+        		this.interpretaLinha(this.linhas.get(i), i);
             }
         }
     }
@@ -67,8 +66,12 @@ class Interpretador {
     // método que interpreta uma linha específica
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(String linha, int i){
-        this.imprimeVariaveis();
-    	System.out.println("linha " + (i+1) + " -->");
+        if(pilha.empty() && linha.length() > 0 && !linha.matches(inicioCodigo)){
+            System.out.println("erro antes de iniciar o programa");
+            System.exit(0);
+        }
+        //this.imprimeVariaveis();
+    	//System.out.println("linha " + (i+1) + " -->");
     	boolean b = linha.matches(laco);
         System.out.println(b);
     	ArrayList<String> tokens = new ArrayList<String>();
@@ -76,6 +79,7 @@ class Interpretador {
     		System.out.println("inicio do codigo");
     		Escopo programa = new Escopo("programa", (i+1));
     		pilha.push(programa);
+            //System.out.println(pilha.peek().getInicio());
     	}
     	else if(linha.matches(declaracaoDeVariavel)){
     		System.out.println("declaracaoDeVariavel");
@@ -112,7 +116,7 @@ class Interpretador {
 	    			double operando1 = 0, operando2 = 0;
 	    			//System.out.println("nome da variavel " + aux.getNome() + " valor " + aux.getValor());
 	                for(int cont = 1; cont < tokens.size(); cont++){
-	                	// se cont for impar, significa que é um operando, senao, é operador
+	                	// se cont for impar, significa que é um operando, else, é operador
 	                	if(cont%2 == 1){
 	                		// codigo para operando
 	                		// verifica se é uma variavel ou um valor
@@ -161,18 +165,18 @@ class Interpretador {
 
 
         }
-        else if(linha.matches(seSenaoSe)){
-        	System.out.println("seSenaoSe");
+        else if(linha.matches(IF)){
+        	System.out.println("IF");
 
         }
         else if(linha.matches(laco)){
         	//codigo para laço
         	System.out.println("laço");
         }
-        else if(linha.matches(senao)){
-            System.out.println("senao");
+        else if(linha.matches(ELSE)){
+            System.out.println("ELSE");
         }
-        else if(linha.matches(fim)){
+        else if(linha.matches(fimEscopo)){
 
         }
         else if(linha.matches(comandoDeEntrada)){
@@ -238,17 +242,19 @@ class Interpretador {
     	//depuracao
     	//for(int cont = 0; cont < tokens.length; cont++){ System.out.println("'" + tokens[cont] + "'" +  " tamanho " + tokens[cont].length()); }
     	ArrayList<String>subTokens = new ArrayList<String>();
-    	if(tokens.length > 1)
-    		// percorre o vetor de tokens, procurando por espacos em branco novamente
-    		for(int indice = 0; indice < tokens.length; indice++)
-    			if(tokens[indice].length() > 0)
-    				subTokens.add(tokens[indice]);
-    		//depuracao
-    		//for(int i = 0; i < subTokens.size(); i++){ System.out.println("'" + subTokens.get(i) + "'" + " tamanho" + subTokens.get(i).length());}
-       	return subTokens;
+    	//if(tokens.length > 1)
+		// percorre o vetor de tokens, procurando por espacos em branco novamente
+		for(int indice = 0; indice < tokens.length; indice++){
+			if(tokens[indice].length() > 0){
+                subTokens.add(tokens[indice]);
+			}
+        }
+		//depuracao
+		//for(int i = 0; i < subTokens.size(); i++){ System.out.println("'" + subTokens.get(i) + "'" + " tamanho" + subTokens.get(i).length());}
+		return subTokens;
     }
 
-    // retorna true se variavel ja existe, senao retorna falso
+    // retorna true se variavel ja existe, else retorna falso
     public Variavel variavelJaExiste(String var){
     	//System.out.println("verificando se variavel ### " + var + " ### ja existe");
 		for(int cont = 0; cont < variavel.size(); cont++)
@@ -266,4 +272,84 @@ class Interpretador {
         }
     	System.out.println("\t###########################################");
     }
+
+    //percorre o arquivo procurando laços, controladores de fluxo, operações, comandos de saída...
+    public ArrayList<String> procuraErros(ArrayList<String> arquivo){
+        ArrayList<String> erro = new ArrayList<String>();
+        for(int cont = 0; cont < arquivo.size(); cont++){
+            if(arquivo.get(cont).matches(inicioCodigo)){
+                Escopo newEscopo = new Escopo("programa", cont+1);
+                pilha.push(newEscopo);
+            }else if(arquivo.get(cont).matches(fimEscopo)){
+                    pilha.peek().setFim(cont+1);
+            }else if(arquivo.get(cont).matches(IF)){
+                Escopo newEscopo = new Escopo("IF", cont+1);
+                pilha.push(newEscopo);
+            }else if(arquivo.get(cont).matches(laco)){
+                Escopo newEscopo = new Escopo("laço", cont+1);
+                pilha.push(newEscopo);
+            }else if(   arquivo.get(cont).matches(declaracaoDeVariavel) ||
+                        arquivo.get(cont).matches(declaracaoDeVariavelComAtribuicao) ||
+                        arquivo.get(cont).matches(atribuicaoComExpressao) ||
+                        arquivo.get(cont).matches(comandoDeSaida) ||
+                        arquivo.get(cont).matches(comandoDeEntrada)
+                    ){
+
+            }else{
+                erro.add("erro na linha " + (cont+1));
+            }
+        }
+        return erro;
+    }
+
+    public void imprimeErros(ArrayList<String> erro){
+        for(int cont = 0; cont < erro.size(); cont++){
+            System.out.println(erro.get(cont));
+        }
+        System.exit(0);
+    }
+
+
+    public ArrayList<String> separaPalavrasArquivo(ArrayList<String> arquivo){
+        ArrayList<String> palavrasArquivo = new ArrayList<String>();
+        for(int cont = 0; cont < arquivo.size(); cont++){
+            System.out.println(arquivo.get(cont));
+            palavrasArquivo.addAll(this.procuraTokens(arquivo.get(cont), Interpretador.espacoEmBranco));
+        }
+        return palavrasArquivo;
+    }
+
+    public void imprimePalavras(ArrayList<String> palavra){
+        for(int cont = 0; cont < palavra.size(); cont++){
+            System.out.println(palavra.get(cont));
+        }
+    }
+
+    public String concatenaPalavrasArquivo(ArrayList<String> arquivo){
+        String s = "";
+        for(int cont = 0; cont < arquivo.size(); cont++){
+            s = s + arquivo.get(cont);
+        }
+        return s;
+    }
+
+    public void imprimelinhasConcatenadas(String arquivo){
+    	System.out.println(arquivo);
+    }
+
+
+
+    public String concatenaLinhasArquivo(ArrayList<String> arquivo){
+        String s = "";
+        for(int cont = 0; cont < arquivo.size(); cont++){
+            s = s + " " + arquivo.get(cont);
+        }
+        return s;
+    }
+
+
+
+
+
+
 }
