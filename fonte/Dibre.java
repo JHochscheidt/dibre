@@ -1,18 +1,18 @@
 // CÓDIGO COPIADO DOS ARQUIVOS DISPONIBILIZADOS VIA MOODLE PELO PROFESSOR FERNANDO
 
 /*
- * 
- * Universidade Federal da Fronteira Sul 
+ *
+ * Universidade Federal da Fronteira Sul
  * Curso : Ciência da Computação
  * Componente Curricular : Programação I
  * Professor : Fernando Bevilacqua
  * Acadêmicos : Jackson Henrique Hochscheidt	e-mail : jackson94h@gmail.com
- * 				Maikiel Roos					e-mail : 
- * 	
+ * 				Maikiel Roos					e-mail :
+ *
 */
 
 /*
- * 
+ *
  * Implementar um programa em Java que interprete uma linguagem de
  * programação. O interpretador deve ser capaz de analisar e reagir corretamente às seguintes
  * situações no arquivo fonte que ele esteja interpretando:
@@ -24,7 +24,7 @@
  * Comando de saída (ex.: mostrar algo na tela);
  * Controlador de fluxo (ex.: if);
  * Aninhamento de comandos (ex.: ifs dentro de ifs, laços dentro de laços).
- * 
+ *
  */
 
 
@@ -33,13 +33,13 @@ import java.io.*;
 import java.util.ArrayList;
 
 class Dibre {
-	
+
     public static void main(String args[]) throws Exception {
         File f;
         Scanner s;
         Interpretador b;
-        ArrayList<String> linhas = new ArrayList<String>(); 
-
+        ArrayList<String> linhas = new ArrayList<String>();
+		ArrayList<String> erros = new ArrayList<String>();
         // args[0] conterá o caminho para o arquivo que serah interpretado.
         f = new File(args[0]);
         // Mandamos o Scanner ler a partir do arquivo.
@@ -53,12 +53,18 @@ class Dibre {
         	linhas.add(s.nextLine());
         }
 
+
+		//erros = b.procuraErros(linhas);
+		//b.imprimeErros(erros);
+
+
+
         // Inicializamos o interpretador com o vetor de linhas. A partir
         // desse ponto, o objeto "b" irá interpretar o código lido do arquivo.
         b.interpreta(linhas);
-        
+
         //System.out.println("imprimindo variaveis");
         b.imprimeVariaveis();
-        
+
     }
 }
