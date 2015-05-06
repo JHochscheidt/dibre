@@ -1,13 +1,25 @@
  	 	 	 	INICIO
 
 
-varReal var;
-varReal var1 ;
-varReal          var2;
-varReal             var3            ;
+varReal var=10.10
+;varReal var1=-20.50;varReal var2,var4,var5,var6;varReal             var3            ;
+
+
         varReal var4;
+
+
         varReal         var5;
+
+
         varReal              var6           ;
+
+
+
+
+
+
+
+
 
 
 
