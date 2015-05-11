@@ -1,5 +1,5 @@
 class Operacao{
-		
+
 	public static double operacao(double operando1, double operando2, String operacao){
 		if(operacao.equals("SUBTRAI"))
 			return operando1 - operando2;
@@ -7,14 +7,10 @@ class Operacao{
 			return operando1 + operando2;
 		else if(operacao.equals("MULTIPLICA"))
 			return operando1 * operando2;
-		else if(operacao.equals("DIVIDE")){
-			if(operando2 == 0){
-				// retornar null ou false, pois operacao nao é possivel
-			}
+		else if(operacao.equals("DIVIDE"))
 			return operando1/operando2;
-		}
 		else
 			return 0;
-		
+
 	}
 }

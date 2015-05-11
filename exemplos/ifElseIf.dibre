@@ -2,7 +2,11 @@
         INICIO
 
     varReal a = 10 ;
-          IF -10.10 MAIOR 50.123412341 FAÇA
+    varReal b = a;
+    varReal c;
+    c = -10.10 SOMA 50 ;
+
+          IF a MENOR c FAÇA
             a = a SOMA a ;
 
         FIM

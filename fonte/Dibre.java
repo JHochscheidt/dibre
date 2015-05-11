@@ -69,7 +69,7 @@ class Dibre {
         b.interpreta(linhas);
 
         //System.out.println("imprimindo variaveis");
-        //b.imprimeVariaveis();
+        b.imprimeVariaveis();
 
     }
 }

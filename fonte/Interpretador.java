@@ -34,7 +34,7 @@ class Interpretador {
     String valor = "\\-?\\d{1,}\\.?\\d{0,}";
     String pontoEVirgula = "\\s{0,};\\s{0,}";
     String operadoresAritmeticos = "(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)";
-    String operadoresRelacionais = "(MAIOR|MENOR|IGUAL|MAIORouIGUAL|MENORouIGUAL|DIFERENTE)";
+    String operadoresRelacionais = "(MAIORQUE|MENORQUE|IGUAL|MAIORouIGUAL|MENORouIGUAL|DIFERENTE)";
     String operadoresLogicos = "(OU|E)";
     String operacaoAritmetica = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresAritmeticos + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
     String operacaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
@@ -66,15 +66,13 @@ class Interpretador {
                     //System.out.println("interpreta linha");
                     this.interpretaLinha(this.codigo, linha);
                 }
-
             }
-
         }
     }
 
     // método que interpreta uma linha específica
     // todas as linhas serão interpretadas através de expressão regular
-    public void interpretaLinha(ArrayList<String> codigo, int linha){
+    public void interpretaLinha(ArrayList<String> codigo, int linha) throws NumberFormatException{
     	if(codigo.get(linha).matches(inicioCodigo)){
     		System.out.println("inicio do codigo");
     		Escopo programa = new Escopo("programa", (linha+1));
@@ -123,7 +121,7 @@ class Interpretador {
                 tokens.clear();
             }
         }
-         else if(codigo.get(linha).matches(atribuicaoComExpressao)){
+        else if(codigo.get(linha).matches(atribuicaoComExpressao)){
     		System.out.println("atribuicaoComExpressao");
     		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|^" + operadoresAritmeticos + "|;|="));
     		for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
@@ -143,8 +141,8 @@ class Interpretador {
 	                		// codigo para operando
 	                		// verifica se é uma variavel ou um valor
 	                		if(tokens.get(cont).matches("[a-zA-Z]{1,}\\w{0,}")){
-	                			System.out.println("é variavel");
-	                			System.out.println(tokens.get(cont));
+	                			//System.out.println("é variavel");
+	                			//System.out.println(tokens.get(cont));
 	                			//verifica se existe variavel com esse nome, e se ja foi inicializada
 	                			if(this.variavelJaExiste(tokens.get(cont)) != null && this.variavelJaExiste(tokens.get(cont)).getInicializada()){
 	                				if(cont == 1){
@@ -152,7 +150,11 @@ class Interpretador {
 	                					System.out.println("valor operador 1 " + operando1);
 	                				}else{
 	                					operando2 = this.variavelJaExiste(tokens.get(cont)).getValor();
-	                					System.out.println("valor operador 1 " + operando2);
+	                					//System.out.println("valor operador 1 " + operando2);
+                                        if(operador.equals("DIVIDE") && operando2 == 0.0){
+                                            System.out.println("operando 2 igual a zero impossivel dividir");
+                                            System.exit(0);
+                                        }
 	                				}
 	                			}else{
 	                				System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(cont) + " ### não existe ou não foi inicializada");
@@ -164,13 +166,14 @@ class Interpretador {
 	    	    					operando1 = Double.parseDouble(tokens.get(cont));
 	                			}else{
 	    	    					operando2 = Double.parseDouble(tokens.get(cont));
+                                    if(operador.equals("DIVIDE") && operando2 == 0){
+                                        System.out.println("operando 2 igual a zero impossivel dividir");
+                                        System.exit(0);
+                                    }
 	                			}
 	                		}else{
 	                			System.out.println("operadores invalidos");
 	                		}
-	                	}else{
-	                		// codigo para operador
-	                		// poderia fazer verificacao se operador é valido mas nao é necessario, regex ja faz isso
 	                	}
 	                } // for de verificacao de variaveis ou valores
 	                aux.setValor(Operacao.operacao(operando1,operando2,tokens.get(2)));
@@ -182,6 +185,7 @@ class Interpretador {
 	    	    }// else verifica se operador é valido
     		}else{
     				System.out.println("variavel nao existe");
+                    System.exit(0);
     		} // else verifica se variavel existe
             tokens.clear();
 

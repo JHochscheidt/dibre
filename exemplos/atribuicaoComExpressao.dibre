@@ -1,6 +1,8 @@
-varReal a = 10 ;
-varReal b = 20 ;
-varReal c;
-         c          =           a            SOMA            b       ;      
 
-c = c DIVIDE a;
+INICIO
+
+varReal a = 10.10 ;
+varReal b = -5 ;
+varReal c;
+         c          =           a            SOMA            b       ;
+c = a DIVIDE 10;
