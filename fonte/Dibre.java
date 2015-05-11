@@ -48,10 +48,15 @@ class Dibre {
         b = new Interpretador();
 
         // Lemos todas as linhas do arquivo para dentro do
-        // ArrayList "linhas".
+        // ArrayList "linhas" OBS: joga apenas linhas que não sejam vazias.
         while(s.hasNext()) {
-        	linhas.add(s.nextLine());
+            //String aux = s.nextLine();
+            //System.out.println("aux" + aux + aux.length());
+            //if(aux.length() == 0){}
+            //else{}
+            linhas.add(s.nextLine());
         }
+        //for(int cont = 0; cont < linhas.size() ; cont++){ System.out.println(linhas.get(cont)); }
 
 
 		//erros = b.procuraErros(linhas);
@@ -64,7 +69,7 @@ class Dibre {
         b.interpreta(linhas);
 
         //System.out.println("imprimindo variaveis");
-        b.imprimeVariaveis();
+        //b.imprimeVariaveis();
 
     }
 }

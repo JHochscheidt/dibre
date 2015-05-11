@@ -11,15 +11,22 @@ import java.util.Stack;
 import java.util.regex.*;
 
 class Interpretador {
-    private ArrayList<String> linhas;
+    private ArrayList<String> codigo;
     public static final String espacoEmBranco = "[ \b\t\n\f\r]";
 	public ArrayList<Variavel> variavel = new ArrayList<Variavel>();
+    ArrayList<String> tokens = new ArrayList<String>();
 	Stack<Escopo> pilha = new Stack<Escopo>();
 
     /*
      * Expressões regulares usadas para interpretação de cada linha do código
      * As expressões dirão como funcionará cada tipo de comando
     */
+
+    //String comandoDeSaida ="\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{1,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\s{0,}\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}\\s{0,};\\s{0,}";
+    /// atribuicao com expressao aceitando varios operadores e operandos
+    //"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
+    //"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\+|\\-|\\*\\/\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\s{0,};\\s{0,}";
+
 	String inicioCodigo = "\\s{0,}INICIO\\s{0,}";
 	String fimEscopo = "\\s{0,}FIM\\s{0,}";
 	String tipoDeVariavel = "varReal";
@@ -33,77 +40,92 @@ class Interpretador {
     String operacaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
     String operacaoLogica = "(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}" + operadoresLogicos + "\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{0,}";
     String declaracaoDeVariavel = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + pontoEVirgula;
-    String declaracaoDeVariavelComAtribuicao = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + valor + pontoEVirgula;
+    String declaracaoDeVariavelComAtribuicao = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + "(" + valor + "|" + nomeDeVariavel + ")" + pontoEVirgula;
+    String atribuicaoSimples = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + "(" + nomeDeVariavel + "|" + valor + ")" + pontoEVirgula;
     String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + operacaoAritmetica + pontoEVirgula;
-    String IF = "\\s{0,}IF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
-    String elseIf = "\\s{0,}ELSEIF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
+    String atribuicao = atribuicaoSimples + "|" + atribuicaoComExpressao ;
+    String IF = "\\s{0,}IF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + "|" + atribuicaoComExpressao + ")\\s{1,}FAÇA\\s{0,}";
+    String ELSEIF = "\\s{0,}ELSEIF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
     String ELSE = "\\s{0,}ELSE\\s{1,}FAÇA";
     String laco = "\\s{0,}ENQUANTO\\s{0,}(" + operacaoLogica + ")\\s{0,}FAÇA\\s{0,}";
     String comandoDeSaida = "\\s{0,}MOSTRAR\\s{1,}[(\\$" + nomeDeVariavel + "|" + valor + "|\\w{1}\\s{0,}|\\S|\n)\\s{1,}]{0,}" + pontoEVirgula ;
     String comandoDeEntrada = "";
 
-    //String comandoDeSaida ="\\s{0,}MOSTRAR\\s{1,}(\\#\\s{0,}(\\w{1,}\\s{1,}){0,}\\#|[a-zA-Z]{1,}\\w{0,}|\\s{0,}\\-?\\d{1,}\\.?\\d{0,})\\s{1,}]{1,}\\s{0,};\\s{0,}";
-
-    /* atribuicao com expressao aceitando varios operadores e operandos
-    "\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=[[\\s{0,}\\-?\\d{1,}\\.?\\d{0,}]|[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]][\\s{0,}[SOMA|SUBTRAI|MULTIPLICA|DIVIDE][\\s{0,}\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[\\s{0,}[\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}]]]{0,}\\s{0,};\\s{0,}";
-    */
-    //"\\s{0,}[a-zA-Z]{1,}\\w{0,}\\s{0,}=\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\+|\\-|\\*\\/\\s{0,}[[\\-?\\d{1,}\\.?\\d{0,}\\s{0,}]|[[a-zA-Z]{1,}\\w{0,}\\s{0,}]]\\s{0,};\\s{0,}";
-
-
-
     // metodo que recebe as linhas do arquivo
     public void interpreta(ArrayList<String> l) {
-        this.linhas = l;
+        this.codigo = l;
         //percorre as linhas do arquivo
-        for(int i = 0; i < this.linhas.size(); i++) {
+        for(int linha = 0; linha < this.codigo.size(); linha++) {
         	//verifica se a linha está vazia
-        	if(this.linhas.get(i).length() != 0){
-        		this.interpretaLinha(this.linhas.get(i), i);
+            //System.out.println(linhas.get(i) + "tamanho" + linhas.get(i).length());
+        	if(this.codigo.get(linha).length() != 0){
+                if(pilha.empty() && codigo.get(linha).length() > 0 && !codigo.get(linha).matches(inicioCodigo)){
+                    System.out.println("erro antes de iniciar o programa");
+                    System.exit(0);
+                }else{
+                    //System.out.println("interpreta linha");
+                    this.interpretaLinha(this.codigo, linha);
+                }
+
             }
+
         }
     }
 
     // método que interpreta uma linha específica
     // todas as linhas serão interpretadas através de expressão regular
-    public void interpretaLinha(String linha, int i){
-        if(pilha.empty() && linha.length() > 0 && !linha.matches(inicioCodigo)){
-            System.out.println("erro antes de iniciar o programa");
-            System.exit(0);
-        }
-        //this.imprimeVariaveis();
-    	//System.out.println("linha " + (i+1) + " -->");
-    	boolean b = linha.matches(laco);
-        System.out.println(b);
-    	ArrayList<String> tokens = new ArrayList<String>();
-    	if(linha.matches(inicioCodigo)){
+    public void interpretaLinha(ArrayList<String> codigo, int linha){
+    	if(codigo.get(linha).matches(inicioCodigo)){
     		System.out.println("inicio do codigo");
-    		Escopo programa = new Escopo("programa", (i+1));
+    		Escopo programa = new Escopo("programa", (linha+1));
     		pilha.push(programa);
             //System.out.println(pilha.peek().getInicio());
     	}
-    	else if(linha.matches(declaracaoDeVariavel)){
+    	else if(codigo.get(linha).matches(declaracaoDeVariavel)){
     		System.out.println("declaracaoDeVariavel");
-    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|" + tipoDeVariavel + "|;"));
+    		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|" + tipoDeVariavel + "|;"));
     		//for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
             if(this.declararVariavel(tokens.get(0),0, false) == null){
-    			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
+    			System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
     			System.exit(0);
     		}
             tokens.clear();
     	}
-        else if(linha.matches(declaracaoDeVariavelComAtribuicao)){
+        else if(codigo.get(linha).matches(declaracaoDeVariavelComAtribuicao)){
     		System.out.println("declaracaoDeVariavelComAtribuicao");
-    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|varReal|=|;"));
+    		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|varReal|=|;"));
             //for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
-    		if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1)),true) == null){
-    			System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
-    			System.exit(0);
-    		}
-            tokens.clear();
-    	}
-        else if(linha.matches(atribuicaoComExpressao)){
+            try{
+                Double.parseDouble(tokens.get(1));
+            }catch(NumberFormatException e){
+                imprimeVariaveis();
+                System.out.println("é nome de variavel");
+                System.out.println(tokens.get(1));
+                if(variavelJaExiste(tokens.get(1)) != null){
+                    System.out.println("variavel existe");
+                    if(this.variavelJaExiste(tokens.get(1)).getInicializada()){
+                        System.out.println("variavel ja existe");
+                        tokens.set(1, String.valueOf(this.variavelJaExiste(tokens.get(1)).getValor()));
+                        System.out.println(tokens.get(1));
+                    }else{
+                        System.out.println("variavel nao inicializada, impossivel imprimir");
+                        System.exit(0);
+                    }
+                }else{
+                    System.out.println("variavel nao existe");
+                    System.exit(0);
+                }
+            }finally{
+                if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1)),true) == null){
+                    System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
+			        System.exit(0);
+                }
+                tokens.clear();
+            }
+        }
+         else if(codigo.get(linha).matches(atribuicaoComExpressao)){
     		System.out.println("atribuicaoComExpressao");
-    		tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|^" + operadoresAritmeticos + "|;|="));
+    		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|^" + operadoresAritmeticos + "|;|="));
     		for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
     		//this.imprimeVariaveis();
     		// verifica se a variavel a receber resultado da expressao existe
@@ -133,7 +155,7 @@ class Interpretador {
 	                					System.out.println("valor operador 1 " + operando2);
 	                				}
 	                			}else{
-	                				System.out.println("Erro na linha @@@ " + (i+1) + " @@@ Variavel ### " + tokens.get(cont) + " ### não existe ou não foi inicializada");
+	                				System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(cont) + " ### não existe ou não foi inicializada");
 	        		    			System.exit(0);
 	                			}
 	                		}else if(tokens.get(cont).matches("\\-?\\d{1,}\\.?\\d{0,}")){
@@ -165,26 +187,41 @@ class Interpretador {
 
 
         }
-        else if(linha.matches(IF)){
+        else if(codigo.get(linha).matches(IF)){
         	System.out.println("IF");
+            Escopo controleDeFluxo = new Escopo("IF", linha+1);
+            int contLinha = 0;
+            for(contLinha = linha; contLinha < codigo.size();contLinha++){
+                if(codigo.get(contLinha).matches(fimEscopo)){
+                    controleDeFluxo.setFim(contLinha+1);
+                    pilha.push(controleDeFluxo);
+                    break;
+                }
+            }
+            if(contLinha == codigo.size()){
+                System.out.println("erro no codigo");
+            }
+            tokens.addAll(this.procuraTokens(codigo.get(linha),Interpretador.espacoEmBranco + "|IF|FAÇA"));
+
+            for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
 
         }
-        else if(linha.matches(laco)){
+        else if(codigo.get(linha).matches(laco)){
         	//codigo para laço
         	System.out.println("laço");
         }
-        else if(linha.matches(ELSE)){
+        else if(codigo.get(linha).matches(ELSE)){
             System.out.println("ELSE");
         }
-        else if(linha.matches(fimEscopo)){
+        else if(codigo.get(linha).matches(fimEscopo)){
 
         }
-        else if(linha.matches(comandoDeEntrada)){
+        else if(codigo.get(linha).matches(comandoDeEntrada)){
 
         }
-        else if(linha.matches(comandoDeSaida)){
+        else if(codigo.get(linha).matches(comandoDeSaida)){
             System.out.println("comando de saida");
-            tokens.addAll(this.procuraTokens(linha, Interpretador.espacoEmBranco + "|;"));
+            tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|;"));
             if(tokens.get(0).equals("MOSTRAR")){
                 System.out.println("comando valido");
                 //for(int cont = 1; cont < tokens.size(); cont++){ System.out.print(tokens.get(cont) + " "); }
@@ -215,7 +252,8 @@ class Interpretador {
             }
         }
         else{
-    		System.out.println("erro linha " + (i+1));
+    		System.out.println("erro linha " + (linha+1));
+            System.exit(0);
     	} // else verificacao de qual expressao regular se trata
 	} // metodo interpretaLinha
 
@@ -233,7 +271,6 @@ class Interpretador {
     	System.out.println("variavel ja existe");
     	return null;
     }
-
     // metodo que separa a linha por tokens
      public ArrayList<String> procuraTokens(String linha, String separadores){
     	//System.out.print("procurando tokens na linha...\n------>>>>>>>>>" + linha);
@@ -253,7 +290,6 @@ class Interpretador {
 		//for(int i = 0; i < subTokens.size(); i++){ System.out.println("'" + subTokens.get(i) + "'" + " tamanho" + subTokens.get(i).length());}
 		return subTokens;
     }
-
     // retorna true se variavel ja existe, else retorna falso
     public Variavel variavelJaExiste(String var){
     	//System.out.println("verificando se variavel ### " + var + " ### ja existe");
@@ -262,7 +298,6 @@ class Interpretador {
 				return variavel.get(cont);
 		return null;
 	}
-
     // percorre o ArrayList de Variavel imprimindo nome e valor de cada variavel
     public void imprimeVariaveis(){
     	System.out.println("\n\t###########################################");
@@ -272,7 +307,6 @@ class Interpretador {
         }
     	System.out.println("\t###########################################");
     }
-
     //percorre o arquivo procurando laços, controladores de fluxo, operações, comandos de saída...
     public ArrayList<String> procuraErros(ArrayList<String> arquivo){
         ArrayList<String> erro = new ArrayList<String>();
@@ -301,15 +335,12 @@ class Interpretador {
         }
         return erro;
     }
-
     public void imprimeErros(ArrayList<String> erro){
         for(int cont = 0; cont < erro.size(); cont++){
             System.out.println(erro.get(cont));
         }
         System.exit(0);
     }
-
-
     public ArrayList<String> separaPalavrasArquivo(ArrayList<String> arquivo){
         ArrayList<String> palavrasArquivo = new ArrayList<String>();
         for(int cont = 0; cont < arquivo.size(); cont++){
@@ -318,13 +349,11 @@ class Interpretador {
         }
         return palavrasArquivo;
     }
-
     public void imprimePalavras(ArrayList<String> palavra){
         for(int cont = 0; cont < palavra.size(); cont++){
             System.out.println(palavra.get(cont));
         }
     }
-
     public String concatenaPalavrasArquivo(ArrayList<String> arquivo){
         String s = "";
         for(int cont = 0; cont < arquivo.size(); cont++){
@@ -332,13 +361,9 @@ class Interpretador {
         }
         return s;
     }
-
     public void imprimelinhasConcatenadas(String arquivo){
     	System.out.println(arquivo);
     }
-
-
-
     public String concatenaLinhasArquivo(ArrayList<String> arquivo){
         String s = "";
         for(int cont = 0; cont < arquivo.size(); cont++){
@@ -346,10 +371,4 @@ class Interpretador {
         }
         return s;
     }
-
-
-
-
-
-
 }
