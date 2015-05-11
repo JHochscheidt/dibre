@@ -1,0 +1,9 @@
+INICIO
+
+varReal a = -10.10;
+varReal b ;
+
+b = 10.342123 SOMA a ;
+
+
+    MOSTRAR $a $b ;
