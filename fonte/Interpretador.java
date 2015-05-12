@@ -39,7 +39,7 @@ class Interpretador {
     String operacaoAritmetica = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresAritmeticos + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
     String operacaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
     String operacaoLogica = "(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}" + operadoresLogicos + "\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{0,}";
-    String declaracaoDeVariavel = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + pontoEVirgula;
+    String declaracaoDeVariavel = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + "[,\\s{0,}" + nomeDeVariavel + "]{0,}" + pontoEVirgula;
     String declaracaoDeVariavelComAtribuicao = "\\s{0,}" + tipoDeVariavel + "\\s{1,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + "(" + valor + "|" + nomeDeVariavel + ")" + pontoEVirgula;
     String atribuicaoSimples = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + "(" + nomeDeVariavel + "|" + valor + ")" + pontoEVirgula;
     String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + operacaoAritmetica + pontoEVirgula;
@@ -81,12 +81,14 @@ class Interpretador {
     	}
     	else if(codigo.get(linha).matches(declaracaoDeVariavel)){
     		System.out.println("declaracaoDeVariavel");
-    		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|" + tipoDeVariavel + "|;"));
-    		//for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
-            if(this.declararVariavel(tokens.get(0),0, false) == null){
-    			System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
-    			System.exit(0);
-    		}
+    		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|" + tipoDeVariavel + "|,|;"));
+    		for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
+            for(int cont = 0; cont < tokens.size(); cont++){
+                if(this.declararVariavel(tokens.get(cont),0, false) == null){
+                    System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(cont) + " ### já declarada");
+                    System.exit(0);
+                }
+            }
             tokens.clear();
     	}
         else if(codigo.get(linha).matches(declaracaoDeVariavelComAtribuicao)){
@@ -311,6 +313,18 @@ class Interpretador {
         }
     	System.out.println("\t###########################################");
     }
+
+    // metodo que procura os escopos do programa
+    public void procuraEscopos(ArrayList<String> arquivo){
+        for(int cont = 0; cont < arquivo.size(); cont++){
+
+        }
+    }
+
+
+
+
+
     //percorre o arquivo procurando laços, controladores de fluxo, operações, comandos de saída...
     public ArrayList<String> procuraErros(ArrayList<String> arquivo){
         ArrayList<String> erro = new ArrayList<String>();
