@@ -34,7 +34,7 @@ class Interpretador {
     String valor = "\\-?\\d{1,}\\.?\\d{0,}";
     String pontoEVirgula = "\\s{0,};\\s{0,}";
     String operadoresAritmeticos = "(SOMA|SUBTRAI|MULTIPLICA|DIVIDE)";
-    String operadoresRelacionais = "(MAIORQUE|MENORQUE|IGUAL|MAIORouIGUAL|MENORouIGUAL|DIFERENTE)";
+    String operadoresRelacionais = "(MAIOR|MENOR|IGUAL|MAIORouIGUAL|MENORouIGUAL|DIFERENTE)";
     String operadoresLogicos = "(OU|E)";
     String operacaoAritmetica = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresAritmeticos + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
     String operacaoRelacional = "(" + nomeDeVariavel + "|" + valor + ")\\s{1,}" + operadoresRelacionais + "\\s{1,}(" + nomeDeVariavel + "|" + valor + ")\\s{0,}";
@@ -44,13 +44,13 @@ class Interpretador {
     String atribuicaoSimples = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + "(" + nomeDeVariavel + "|" + valor + ")" + pontoEVirgula;
     String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + operacaoAritmetica + pontoEVirgula;
     String atribuicao = atribuicaoSimples + "|" + atribuicaoComExpressao ;
-    String IF = "\\s{0,}IF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + "|" + atribuicaoComExpressao + ")\\s{1,}FAÇA\\s{0,}";
-    String ELSEIF = "\\s{0,}ELSEIF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
-    String ELSE = "\\s{0,}ELSE\\s{1,}FAÇA";
-    String laco = "\\s{0,}ENQUANTO\\s{0,}(" + operacaoLogica + ")\\s{0,}FAÇA\\s{0,}";
+    String se = "\\s{0,}IF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + "|" + operacaoLogica + ")\\s{1,}FAÇA\\s{0,}";
+    String senaoSe = "\\s{0,}ELSEIF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
+    String senao = "\\s{0,}ELSE\\s{1,}FAÇA";
+    String laco = "\\s{0,}ENQUANTO\\s{0,}(" + operacaoLogica + "|" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{0,}FAÇA\\s{0,}";
     String comandoDeSaida = "\\s{0,}MOSTRAR\\s{1,}[(\\$" + nomeDeVariavel + "|" + valor + "|\\w{1}\\s{0,}|\\S|\n)\\s{1,}]{0,}" + pontoEVirgula ;
     String comandoDeEntrada = "";
-
+    String escopo = "(" + inicioCodigo + "|" + se + "|" + senaoSe + "|" + senao + "|" + laco + ")" ;
     // metodo que recebe as linhas do arquivo
     public void interpreta(ArrayList<String> l) {
         this.codigo = l;
@@ -74,13 +74,13 @@ class Interpretador {
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(ArrayList<String> codigo, int linha) throws NumberFormatException{
     	if(codigo.get(linha).matches(inicioCodigo)){
-    		System.out.println("inicio do codigo");
+    		//System.out.println("inicio do codigo");
     		Escopo programa = new Escopo("programa", (linha+1));
     		pilha.push(programa);
             //System.out.println(pilha.peek().getInicio());
     	}
     	else if(codigo.get(linha).matches(declaracaoDeVariavel)){
-    		System.out.println("declaracaoDeVariavel");
+    		//System.out.println("declaracaoDeVariavel");
     		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|" + tipoDeVariavel + "|,|;"));
     		for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
             for(int cont = 0; cont < tokens.size(); cont++){
@@ -92,15 +92,15 @@ class Interpretador {
             tokens.clear();
     	}
         else if(codigo.get(linha).matches(declaracaoDeVariavelComAtribuicao)){
-    		System.out.println("declaracaoDeVariavelComAtribuicao");
+    		//System.out.println("declaracaoDeVariavelComAtribuicao");
     		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|varReal|=|;"));
             //for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
             try{
                 Double.parseDouble(tokens.get(1));
             }catch(NumberFormatException e){
                 imprimeVariaveis();
-                System.out.println("é nome de variavel");
-                System.out.println(tokens.get(1));
+                //System.out.println("é nome de variavel");
+                //System.out.println(tokens.get(1));
                 if(variavelJaExiste(tokens.get(1)) != null){
                     System.out.println("variavel existe");
                     if(this.variavelJaExiste(tokens.get(1)).getInicializada()){
@@ -193,31 +193,18 @@ class Interpretador {
 
 
         }
-        else if(codigo.get(linha).matches(IF)){
-        	System.out.println("IF");
-            Escopo controleDeFluxo = new Escopo("IF", linha+1);
-            int contLinha = 0;
-            for(contLinha = linha; contLinha < codigo.size();contLinha++){
-                if(codigo.get(contLinha).matches(fimEscopo)){
-                    controleDeFluxo.setFim(contLinha+1);
-                    pilha.push(controleDeFluxo);
-                    break;
-                }
-            }
-            if(contLinha == codigo.size()){
-                System.out.println("erro no codigo");
-            }
+        else if(codigo.get(linha).matches(se)){
+            System.out.println("\n\nAQUI\n\n");
             tokens.addAll(this.procuraTokens(codigo.get(linha),Interpretador.espacoEmBranco + "|IF|FAÇA"));
-
-            for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
+            for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'" + cont);
 
         }
         else if(codigo.get(linha).matches(laco)){
         	//codigo para laço
         	System.out.println("laço");
         }
-        else if(codigo.get(linha).matches(ELSE)){
-            System.out.println("ELSE");
+        else if(codigo.get(linha).matches(senaoSe)){
+            System.out.println("ELSEIF");
         }
         else if(codigo.get(linha).matches(fimEscopo)){
 
@@ -314,16 +301,27 @@ class Interpretador {
     	System.out.println("\t###########################################");
     }
 
-    // metodo que procura os escopos do programa
-    public void procuraEscopos(ArrayList<String> arquivo){
+    // metodo que verifica se os escopos do programa estao corretos
+    public void verificaEscopos(ArrayList<String> arquivo){
         for(int cont = 0; cont < arquivo.size(); cont++){
-
+            if(arquivo.get(cont).matches(escopo)){
+                //System.out.println("é escopo. LINHA " + (cont+1));
+                Escopo novo = new Escopo("Escopo", (cont+1));
+                pilha.push(novo);
+            }else if(arquivo.get(cont).matches(fimEscopo)){
+                if(!pilha.isEmpty()){
+                    pilha.pop();
+                }else{
+                    System.out.println("Fim de escopo sobrando");
+                    System.exit(0);
+                }
+            }
+        }
+        if(!pilha.isEmpty()){
+            System.out.println("Falta fechar escopo em alguma linha");
+            System.exit(0);
         }
     }
-
-
-
-
 
     //percorre o arquivo procurando laços, controladores de fluxo, operações, comandos de saída...
     public ArrayList<String> procuraErros(ArrayList<String> arquivo){
@@ -334,7 +332,7 @@ class Interpretador {
                 pilha.push(newEscopo);
             }else if(arquivo.get(cont).matches(fimEscopo)){
                     pilha.peek().setFim(cont+1);
-            }else if(arquivo.get(cont).matches(IF)){
+            }else if(arquivo.get(cont).matches(se)){
                 Escopo newEscopo = new Escopo("IF", cont+1);
                 pilha.push(newEscopo);
             }else if(arquivo.get(cont).matches(laco)){
