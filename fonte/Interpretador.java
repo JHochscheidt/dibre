@@ -44,7 +44,7 @@ class Interpretador {
     String atribuicaoSimples = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + "(" + nomeDeVariavel + "|" + valor + ")" + pontoEVirgula;
     String atribuicaoComExpressao = "\\s{0,}" + nomeDeVariavel + "\\s{0,}=\\s{0,}" + operacaoAritmetica + pontoEVirgula;
     String atribuicao = atribuicaoSimples + "|" + atribuicaoComExpressao ;
-    String se = "\\s{0,}IF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + "|" + operacaoLogica + ")\\s{1,}FAÇA\\s{0,}";
+    String se = "\\s{0,}IF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
     String senaoSe = "\\s{0,}ELSEIF\\s{1,}(" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{1,}FAÇA\\s{0,}";
     String senao = "\\s{0,}ELSE\\s{1,}FAÇA";
     String laco = "\\s{0,}ENQUANTO\\s{0,}(" + operacaoLogica + "|" + operacaoAritmetica + "|" + operacaoRelacional + ")\\s{0,}FAÇA\\s{0,}";
@@ -73,7 +73,8 @@ class Interpretador {
     // método que interpreta uma linha específica
     // todas as linhas serão interpretadas através de expressão regular
     public void interpretaLinha(ArrayList<String> codigo, int linha) throws NumberFormatException{
-    	if(codigo.get(linha).matches(inicioCodigo)){
+    	System.out.println("LINHA " + (linha+1));
+        if(codigo.get(linha).matches(inicioCodigo)){
     		//System.out.println("inicio do codigo");
     		Escopo programa = new Escopo("programa", (linha+1));
     		pilha.push(programa);
@@ -95,109 +96,89 @@ class Interpretador {
     		//System.out.println("declaracaoDeVariavelComAtribuicao");
     		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|varReal|=|;"));
             //for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'");
-            try{
-                Double.parseDouble(tokens.get(1));
-            }catch(NumberFormatException e){
-                imprimeVariaveis();
-                //System.out.println("é nome de variavel");
-                //System.out.println(tokens.get(1));
-                if(variavelJaExiste(tokens.get(1)) != null){
-                    System.out.println("variavel existe");
-                    if(this.variavelJaExiste(tokens.get(1)).getInicializada()){
-                        System.out.println("variavel ja existe");
-                        tokens.set(1, String.valueOf(this.variavelJaExiste(tokens.get(1)).getValor()));
-                        System.out.println(tokens.get(1));
-                    }else{
-                        System.out.println("variavel nao inicializada, impossivel imprimir");
-                        System.exit(0);
-                    }
-                }else{
-                    System.out.println("variavel nao existe");
-                    System.exit(0);
-                }
-            }finally{
-                if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1)),true) == null){
-                    System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
-			        System.exit(0);
-                }
-                tokens.clear();
+            if(ehVariavel(tokens.get(1))){
+                tokens.set(1, String.valueOf(this.variavelJaExiste(tokens.get(1)).getValor()));
             }
+            if(this.declararVariavel(tokens.get(0),Double.parseDouble(tokens.get(1)),true) == null){
+                System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(0) + " ### já declarada");
+			    System.exit(0);
+            }
+            tokens.clear();
         }
-        else if(codigo.get(linha).matches(atribuicaoComExpressao)){
-    		System.out.println("atribuicaoComExpressao");
+        else if(codigo.get(linha).matches(atribuicao)){
+    		System.out.println("atribuicao");
     		tokens.addAll(this.procuraTokens(codigo.get(linha), Interpretador.espacoEmBranco + "|^" + operadoresAritmeticos + "|;|="));
-    		for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
+            for(int cont = 0; cont < tokens.size(); cont++){ System.out.println(cont + " '" + tokens.get(cont) + "'" + " size " + tokens.get(cont).length()); }
     		//this.imprimeVariaveis();
     		// verifica se a variavel a receber resultado da expressao existe
-    		if(this.variavelJaExiste(tokens.get(0)) != null){
-    			String operador = tokens.get(2);
-    			// verifica se o operador é valido
-    			if(operador.equals("SOMA") || operador.equals("SUBTRAI") || operador.equals("MULTIPLICA") || operador.equals("DIVIDE")){
-                	//System.out.println("aqui");
-	    			Variavel aux = this.variavelJaExiste(tokens.get(0));
-	    			double operando1 = 0, operando2 = 0;
-	    			//System.out.println("nome da variavel " + aux.getNome() + " valor " + aux.getValor());
-	                for(int cont = 1; cont < tokens.size(); cont++){
-	                	// se cont for impar, significa que é um operando, else, é operador
-	                	if(cont%2 == 1){
-	                		// codigo para operando
-	                		// verifica se é uma variavel ou um valor
-	                		if(tokens.get(cont).matches("[a-zA-Z]{1,}\\w{0,}")){
-	                			//System.out.println("é variavel");
-	                			//System.out.println(tokens.get(cont));
-	                			//verifica se existe variavel com esse nome, e se ja foi inicializada
-	                			if(this.variavelJaExiste(tokens.get(cont)) != null && this.variavelJaExiste(tokens.get(cont)).getInicializada()){
-	                				if(cont == 1){
-	                					operando1 = this.variavelJaExiste(tokens.get(cont)).getValor();
-	                					System.out.println("valor operador 1 " + operando1);
-	                				}else{
-	                					operando2 = this.variavelJaExiste(tokens.get(cont)).getValor();
-	                					//System.out.println("valor operador 1 " + operando2);
-                                        if(operador.equals("DIVIDE") && operando2 == 0.0){
-                                            System.out.println("operando 2 igual a zero impossivel dividir");
-                                            System.exit(0);
-                                        }
-	                				}
-	                			}else{
-	                				System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(cont) + " ### não existe ou não foi inicializada");
-	        		    			System.exit(0);
-	                			}
-	                		}else if(tokens.get(cont).matches("\\-?\\d{1,}\\.?\\d{0,}")){
-	                			System.out.println("é valor");
-	                			if(cont == 1){
-	    	    					operando1 = Double.parseDouble(tokens.get(cont));
-	                			}else{
-	    	    					operando2 = Double.parseDouble(tokens.get(cont));
-                                    if(operador.equals("DIVIDE") && operando2 == 0){
-                                        System.out.println("operando 2 igual a zero impossivel dividir");
-                                        System.exit(0);
-                                    }
-	                			}
-	                		}else{
-	                			System.out.println("operadores invalidos");
-	                		}
-	                	}
-	                } // for de verificacao de variaveis ou valores
-	                aux.setValor(Operacao.operacao(operando1,operando2,tokens.get(2)));
+    	    if(this.variavelJaExiste(tokens.get(0)) != null){
+                double operando1 = 0, operando2 = 0;
+                Variavel aux = this.variavelJaExiste(tokens.get(0));
+                for(int cont = 1; cont < tokens.size(); cont++){
+                	// se cont for impar, significa que é um operando, else, é operador
+                	if(cont%2 == 1){
+                		// codigo para operando
+                		// verifica se é uma variavel ou um valor
+                		if(tokens.get(cont).matches("[a-zA-Z]{1,}\\w{0,}")){
+                			//System.out.println("é variavel");
+                			//System.out.println(tokens.get(cont));
+                			//verifica se existe variavel com esse nome, e se ja foi inicializada
+                			if(this.variavelJaExiste(tokens.get(cont)) != null && this.variavelJaExiste(tokens.get(cont)).getInicializada()){
+                				if(cont == 1){
+                					operando1 = this.variavelJaExiste(tokens.get(cont)).getValor();
+                					System.out.println("valor operador 1 " + operando1);
+                				}else{
+                					operando2 = this.variavelJaExiste(tokens.get(cont)).getValor();
+                				}
+                			}else{
+                				System.out.println("Erro na linha @@@ " + (linha+1) + " @@@ Variavel ### " + tokens.get(cont) + " ### não existe ou não foi inicializada");
+        		    			System.exit(0);
+                			}
+                		}else if(tokens.get(cont).matches("\\-?\\d{1,}\\.?\\d{0,}")){
+                			System.out.println("é valor");
+                			if(cont == 1){
+    	    					operando1 = Double.parseDouble(tokens.get(cont));
+                			}else{
+    	    					operando2 = Double.parseDouble(tokens.get(cont));
+                			}
+                		}else{
+                			System.out.println("operadores invalidos");
+                		}
+                	}
+                } // for de verificacao de variaveis ou valores
+                if(tokens.size() > 2){
+                    String operador = tokens.get(2);
+                    if(operador.equals("SOMA") || operador.equals("SUBTRAI") || operador.equals("MULTIPLICA") || operador.equals("DIVIDE")){
+                        aux.setValor(Operacao.operacaoAritmetica(operando1,operando2,operador));
+                        aux.setInicializada(true);
+                        //System.out.println(aux.getInicializada() + " " + aux.getValor() + " " + aux.getNome());
+                    }else{
+            			System.out.println("operador nao existe");
+            			System.exit(0);
+            	    }// else verifica se operador é valido
+                }else{
+                    aux.setValor(Operacao.operacaoAritmetica(operando1,operando2,"SOMA"));
                     aux.setInicializada(true);
-                    //System.out.println(aux.getInicializada() + " " + aux.getValor() + " " + aux.getNome());
-	    	    }else{
-	    			System.out.println("operador nao existe");
-	    			System.exit(0);
-	    	    }// else verifica se operador é valido
+                }
     		}else{
-    				System.out.println("variavel nao existe");
-                    System.exit(0);
+    			System.out.println("variavel @@@ " + tokens.get(0) + " @@@ nao existe");
+                System.exit(0);
     		} // else verifica se variavel existe
             tokens.clear();
-
-
         }
         else if(codigo.get(linha).matches(se)){
-            System.out.println("\n\nAQUI\n\n");
+            System.out.println("\n\nIFFFFFFF\n\n");
             tokens.addAll(this.procuraTokens(codigo.get(linha),Interpretador.espacoEmBranco + "|IF|FAÇA"));
             for(int cont = 0; cont < tokens.size(); cont++) System.out.println("'" + tokens.get(cont) + "'" + cont);
+            if(verificaCondicao(tokens)){
+                System.out.println("condicao válida");
+            }
 
+                //if(Operacao.operacaoAritmetica(tokens.get(0), tokens.get(2), tokens.get(1))){
+                    System.out.println("entra no if");
+                //}else{
+                    System.out.println("nao entra no if");
+                //}
         }
         else if(codigo.get(linha).matches(laco)){
         	//codigo para laço
@@ -250,7 +231,31 @@ class Interpretador {
     	} // else verificacao de qual expressao regular se trata
 	} // metodo interpretaLinha
 
-    // metodo que vai tentar declarar variavel sem atribuicao
+    // metodo que verifica se os componentes de uma condicao (if, else if) estao corretas
+    public boolean verificaCondicao(ArrayList<String> componente){
+        if(componente.size() == 3){
+            System.out.println("verificando condicao...");
+            for(int cont = 0; cont < componente.size(); cont++){
+                System.out.printf("aqui for \n");
+                if(cont % 2 == 0){
+                    System.out.printf("igual 0\n" + cont);
+                    if(!ehVariavel(componente.get(cont))){
+                        System.out.println("Não é variavel");
+                        return false;
+                    }
+                }else if(cont % 2 == 1){
+                    if(!(componente.get(cont).equals(operadoresAritmeticos) || componente.get(cont).equals(operadoresAritmeticos))){
+                        return false;
+                    }
+                }
+            }
+        return true;
+        }else{
+            return false;
+        }
+    }
+
+    // metodo que vai tentar declarar variavel
     public Variavel declararVariavel(String nome, double valor, boolean inicializada){
     	//System.out.println("declarando variavel...\n ----->>>>>" + nome);
     	if(variavelJaExiste(nome) == null){
@@ -300,6 +305,29 @@ class Interpretador {
         }
     	System.out.println("\t###########################################");
     }
+
+    // metodo que verifica se palavra é um valor ou uma variavel
+    public boolean ehVariavel(String palavra) throws NumberFormatException{
+        try{
+            Double.parseDouble(palavra);
+            return false; // retorna falso, pois é um valor e nao uma variavel
+        }catch(NumberFormatException e){
+            // é variavel
+            //System.out.println("é nome de variavel");
+            if(variavelJaExiste(palavra) != null && this.variavelJaExiste(palavra).getInicializada()){
+                // variavel ja existe, pode usar
+                return true;
+                //System.out.println("variavel existe");
+                //System.out.println("variavel ja inicializada, pode atribuir");
+            }else{
+                System.out.println("variavel @@@ " + palavra + " @@@ nao existe");
+                System.exit(0);
+                return false;
+            }
+        }
+    }
+
+
 
     // metodo que verifica se os escopos do programa estao corretos
     public void verificaEscopos(ArrayList<String> arquivo){
