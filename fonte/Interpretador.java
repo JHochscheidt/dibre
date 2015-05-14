@@ -370,8 +370,8 @@ class Interpretador {
                 arquivo.get(cont).matches(declaracaoDeVariavel) || arquivo.get(cont).matches(declaracaoDeVariavelComAtribuicao) ||
                 arquivo.get(cont).matches(atribuicaoComExpressao) || arquivo.get(cont).matches(comandoDeSaida) ||
                 arquivo.get(cont).matches(comandoDeEntrada) || arquivo.get(cont).matches(atribuicao) ||
-                arquivo.get(cont).matches(laco) || arquivo.get(cont).matches(se) || arquivo.get(cont).matches(senaoSe) ||
-                arquivo.get(cont).matches(senao) || arquivo.get(cont).matches(linhaVazia)
+                //arquivo.get(cont).matches(laco) || arquivo.get(cont).matches(se) || arquivo.get(cont).matches(senaoSe) || arquivo.get(cont).matches(senao) ||
+                arquivo.get(cont).matches(linhaVazia)
             )){
                 erro.add("erro na linha " + (cont+1)); // se entrar no if faz isso
             }
