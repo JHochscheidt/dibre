@@ -3,16 +3,12 @@
 
     varReal a = 10 ;
     varReal b = a;
-    varReal c;
-    c = -10.10 SOMA 50 ;
 
-          IF a MENOR c  OU a MAIOR c FAÇA
+    varReal c;
+    c = -10.10 ;
+
+          IF a MENOR c FAÇA
             a = a SOMA a ;
         FIM
-        IF a MENOR c  OU a MAIOR c FAÇA
-         a= a SOMA a;
-         FIM
-         ELSE FAÇA
-          a = 5 ;
-          FIM
+
     FIM

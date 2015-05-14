@@ -5,5 +5,11 @@ varReal b ;
 
 b = 10.342123 SOMA a ;
 
+varReal c;
+
+    c = a;
 
     MOSTRAR $a $b ;
+
+
+FIM

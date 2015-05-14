@@ -4,5 +4,19 @@ INICIO
 varReal a = 10.10 ;
 varReal b = -5 ;
 varReal c;
-         c          =           a            SOMA            b       ;
-c = a DIVIDE 10;
+         c       =           a            SOMA            b       ;
+
+         a = 10 ;
+
+         b = a ;
+
+
+
+         IF a MAIOR c FAÇA
+
+         FIM
+
+
+
+
+FIM
