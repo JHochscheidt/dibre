@@ -3,13 +3,13 @@ INICIO
 varReal a = -10.10;
 varReal b ;
 
-b = 10.342123 SOMA a ;
+b = 20.342123 SOMA a ;
 
 varReal c;
 
     c = a;
 
-    MOSTRAR $a $b ;
+    MOSTRAR $c $b ;
 
 
 FIM

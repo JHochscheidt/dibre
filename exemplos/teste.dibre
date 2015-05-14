@@ -1,0 +1,27 @@
+
+
+
+
+    INICIO
+
+    varReal var1 = 10;
+    varReal var2 = 20;
+
+    varReal var3;
+    var3= var1 SOMA var2;
+    var3 = var1 SOMA 10;
+    var3 = 10 SOMA var1;
+    var3 = 10 SOMA 10;
+    var3 = 0 DIVIDE 10;
+
+
+
+    MOSTRAR informe um valor ;
+
+    LER var3;
+
+    MOSTRAR variavel3 = $var3;
+
+
+
+    FIM

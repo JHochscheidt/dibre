@@ -50,19 +50,11 @@ class Dibre {
         // Lemos todas as linhas do arquivo para dentro do
         // ArrayList "linhas" OBS: joga apenas linhas que não sejam vazias.
         while(s.hasNext()) {
-            //String aux = s.nextLine();
-            //System.out.println("aux" + aux + aux.length());
-            //if(aux.length() == 0){}
-            //else{}
             linhas.add(s.nextLine());
         }
-        //for(int cont = 0; cont < linhas.size() ; cont++){ System.out.println(linhas.get(cont)); }
-
-
-		//erros = b.procuraErros(linhas);
-		//b.imprimeErros(erros);
-
-
+        // procura erros no codigo, e se ouver erros, mostra-os na tela
+		erros = b.procuraErros(linhas);
+		b.imprimeErros(erros);
 
         // Inicializamos o interpretador com o vetor de linhas. A partir
         // desse ponto, o objeto "b" irá interpretar o código lido do arquivo.
@@ -70,7 +62,7 @@ class Dibre {
         b.interpreta(linhas);
 
         //System.out.println("imprimindo variaveis");
-        b.imprimeVariaveis();
+        //b.imprimeVariaveis();
 
     }
 }
